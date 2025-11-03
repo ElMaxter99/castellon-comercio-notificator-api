@@ -1,6 +1,12 @@
 const express = require("express");
-const { getComercios, getLastUpdate, getHistory, getSectors } = require("../services/redisService");
+const {
+  getComercios,
+  getLastUpdate,
+  getHistory,
+  getSectors,
+} = require("../services/redisService");
 const { runScrape } = require("../cron");
+const logger = require("../utils/logger");
 
 const router = express.Router();
 
@@ -12,7 +18,10 @@ router.get("/", async (req, res) => {
     const data = await getComercios();
     res.json(data);
   } catch (err) {
-    console.error("Error obteniendo comercios:", err.message);
+    logger.error("Error obteniendo comercios", {
+      context: "ROUTE:COMERCIOS",
+      meta: err,
+    });
     res.status(500).json({ error: "Error obteniendo comercios" });
   }
 });
@@ -33,7 +42,10 @@ router.get("/status", async (req, res) => {
       lastUpdate: lastUpdate ? lastUpdate.toISOString() : null,
     });
   } catch (err) {
-    console.error("Error obteniendo estado:", err.message);
+    logger.error("Error obteniendo estado", {
+      context: "ROUTE:STATUS",
+      meta: err,
+    });
     res.status(500).json({ error: "Error obteniendo estado" });
   }
 });
@@ -46,7 +58,10 @@ router.get("/history", async (req, res) => {
     const history = await getHistory();
     res.json(history);
   } catch (err) {
-    console.error("Error obteniendo histórico:", err.message);
+    logger.error("Error obteniendo histórico", {
+      context: "ROUTE:HISTORY",
+      meta: err,
+    });
     res.status(500).json({ error: "Error obteniendo histórico" });
   }
 });
@@ -59,7 +74,10 @@ router.post("/force-scrape", async (req, res) => {
     await runScrape(true);
     res.json({ ok: true, message: "Scrapeo manual completado." });
   } catch (err) {
-    console.error("Error ejecutando scrapeo manual:", err.message);
+    logger.error("Error ejecutando scrapeo manual", {
+      context: "ROUTE:FORCE_SCRAPE",
+      meta: err,
+    });
     res.status(500).json({ ok: false, error: err.message });
   }
 });
@@ -85,7 +103,10 @@ router.get("/filter", async (req, res) => {
 
     res.json(filtered);
   } catch (err) {
-    console.error("Error filtrando comercios:", err.message);
+    logger.error("Error filtrando comercios", {
+      context: "ROUTE:FILTER",
+      meta: err,
+    });
     res.status(500).json({ error: "Error filtrando comercios" });
   }
 });
@@ -95,7 +116,10 @@ router.get("/sectors", async (req, res) => {
     const sectors = await getSectors();
     res.json(sectors);
   } catch (err) {
-    console.error("Error obteniendo sectores:", err.message);
+    logger.error("Error obteniendo sectores", {
+      context: "ROUTE:SECTORS",
+      meta: err,
+    });
     res.status(500).json({ error: "Error obteniendo sectores" });
   }
 });

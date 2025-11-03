@@ -2,7 +2,9 @@
 .env
 .env.local
 .env.prod
+.env.production
 .env.pre
+.env.test
 
 # No copy
 node_modules

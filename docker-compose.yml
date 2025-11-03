@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
   app:
     build: .
-    container_name: bonos-api
+    container_name: castellon-comercios-api
     restart: always
     env_file: .env
     ports:
@@ -11,22 +9,30 @@ services:
     depends_on:
       - redis
     environment:
-      - NODE_ENV=dev        # Options -> dev || staging || production
-      - REDIS_URL=redis://redis:6379
-      - REDIS_NAMESPACE=bonos
-      - FRONTEND_URL=http://localhost:4200
+      - NODE_ENV=${NODE_ENV}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     volumes:
       - .:/usr/src/app
     command: npm start
+    networks:
+      - internal
 
   redis:
-    image: redis:7.4
-    container_name: bonos-redis
+    image: redis:7-alpine
+    container_name: castellon-redis
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
     restart: always
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - internal
+    expose:
+      - "6379" # solo visible dentro del stack
 
 volumes:
   redis_data:
+
+networks:
+  internal:
+    driver: bridge

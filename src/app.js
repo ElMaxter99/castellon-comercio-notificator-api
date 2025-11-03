@@ -1,16 +1,26 @@
 import express from "express";
-import dotenv from "dotenv";
 import comerciosRouter from "./routes/comercios.js";
 import { startCron } from "./cron.js";
+import { redis } from "./config/redis.js";
 
-dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
-
 app.use(express.json());
+
+const port = process.env.PORT || 12001;
+
 app.use("/api/comercios", comerciosRouter);
 
-// Iniciar cron
-startCron();
+app.get("/api/status", async (req, res) => {
+  try {
+    const redisStatus = await redis.ping();
+    res.json({ ok: true, redis: redisStatus, message: "API running" });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: "Redis unreachable" });
+  }
+});
 
-app.listen(port, () => console.log(`🚀 Servidor corriendo en http://localhost:${port}`));
+app.listen(port, async () => {
+  console.log(`🚀 API levantada en http://localhost:${port}`);
+  console.log("⏱️  Iniciando cron de scrapeo cada 5 min...");
+  await startCron();
+});

@@ -1,18 +1,31 @@
-const { getComercios, updateSectorsFromComercios, getSectors } = require("../src/services/redisService");
+const {
+  getComercios,
+  updateSectorsFromComercios,
+  getSectors,
+} = require("../src/services/redisService");
+const logger = require("../src/utils/logger");
 
 (async () => {
   try {
-    console.log("🔍 Cargando comercios desde Redis...");
+    logger.info("Cargando comercios desde Redis", { context: "SCRIPT:SECTORS" });
     const comercios = await getComercios();
 
-    console.log(`📊 Total de comercios: ${comercios.length}`);
+    logger.info("Total de comercios", {
+      context: "SCRIPT:SECTORS",
+      meta: { total: comercios.length },
+    });
     await updateSectorsFromComercios(comercios);
 
     const sectors = await getSectors();
-    console.log(`✅ Sectores actualizados (${sectors.length}):`);
-    console.log(sectors.join(", "));
+    logger.success("Sectores actualizados", {
+      context: "SCRIPT:SECTORS",
+      meta: { total: sectors.length, sectors },
+    });
   } catch (err) {
-    console.error("❌ Error actualizando sectores:", err.message);
+    logger.error("Error actualizando sectores", {
+      context: "SCRIPT:SECTORS",
+      meta: err,
+    });
   } finally {
     process.exit(0);
   }

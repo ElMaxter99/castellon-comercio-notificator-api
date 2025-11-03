@@ -1,9 +1,6 @@
 import nodemailer from "nodemailer";
-import dotenv from "dotenv";
 import { MailTemplates } from "./enums/mailTemplates.js";
 import { getTemplateHtml } from "./templateService.js";
-
-dotenv.config();
 
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,

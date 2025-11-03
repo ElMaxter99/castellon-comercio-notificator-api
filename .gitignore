@@ -1,0 +1,9 @@
+# ENVs
+.env
+.env.local
+.env.prod
+.env.pre
+
+# No copy
+node_modules
+package-lock.json

@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: bonos-api
+    restart: always
+    env_file: .env
+    ports:
+      - "12001:12001"
+    depends_on:
+      - redis
+    environment:
+      - NODE_ENV=dev        # Options -> dev || staging || production
+      - REDIS_URL=redis://redis:6379
+      - REDIS_NAMESPACE=bonos
+      - FRONTEND_URL=http://localhost:4200
+    volumes:
+      - .:/usr/src/app
+    command: npm start
+
+  redis:
+    image: redis:7.4
+    container_name: bonos-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

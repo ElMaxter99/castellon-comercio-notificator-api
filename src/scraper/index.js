@@ -1,5 +1,5 @@
-import axios from "axios";
-import * as cheerio from "cheerio";
+const axios = require("axios");
+const cheerio = require("cheerio");
 
 const BASE_URL = "http://bonoscastellodelaplana.es/establecimientos-adheridos-al-programa";
 
@@ -50,7 +50,7 @@ async function scrapePage(url) {
 /**
  * Scrapea todas las páginas de comercios adheridos.
  */
-export async function scrapeComercios() {
+async function scrapeComercios() {
   let url = BASE_URL;
   let page = 1;
   let allComercios = [];
@@ -77,3 +77,5 @@ export async function scrapeComercios() {
   console.log(`✅ Scrapeo completado. Total comercios: ${allComercios.length}`);
   return allComercios;
 }
+
+module.exports = { scrapeComercios };

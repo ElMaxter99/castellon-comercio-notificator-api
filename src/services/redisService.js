@@ -47,13 +47,13 @@ async function getHistory() {
   return data ? JSON.parse(data) : [];
 }
 
-export async function updateSectorsFromComercios(comercios) {
+async function updateSectorsFromComercios(comercios) {
   const keySectors = key("sectors");
   const sectors = new Set(comercios.map(c => c.sector || "Sin sector"));
   await redis.set(keySectors, JSON.stringify([...sectors]));
 }
 
-export async function getSectors() {
+async function getSectors() {
   const data = await redis.get(key("sectors"));
   return data ? JSON.parse(data) : [];
 }

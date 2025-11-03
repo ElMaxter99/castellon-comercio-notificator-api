@@ -1,5 +1,5 @@
 const express = require("express");
-const { getComercios, getLastUpdate, getHistory } = require("../services/redisService");
+const { getComercios, getLastUpdate, getHistory, getSectors } = require("../services/redisService");
 const { runScrape } = require("../cron");
 
 const router = express.Router();
@@ -61,6 +61,42 @@ router.post("/force-scrape", async (req, res) => {
   } catch (err) {
     console.error("Error ejecutando scrapeo manual:", err.message);
     res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+router.get("/filter", async (req, res) => {
+  try {
+    const { name, sector } = req.query;
+    const comercios = await getComercios();
+
+    let filtered = comercios;
+
+    if (sector) {
+      filtered = filtered.filter(c =>
+        c.sector?.toLowerCase().includes(sector.toLowerCase())
+      );
+    }
+
+    if (name) {
+      filtered = filtered.filter(c =>
+        c.name?.toLowerCase().includes(name.toLowerCase())
+      );
+    }
+
+    res.json(filtered);
+  } catch (err) {
+    console.error("Error filtrando comercios:", err.message);
+    res.status(500).json({ error: "Error filtrando comercios" });
+  }
+});
+
+router.get("/sectors", async (req, res) => {
+  try {
+    const sectors = await getSectors();
+    res.json(sectors);
+  } catch (err) {
+    console.error("Error obteniendo sectores:", err.message);
+    res.status(500).json({ error: "Error obteniendo sectores" });
   }
 });
 

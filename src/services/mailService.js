@@ -1,6 +1,6 @@
-import nodemailer from "nodemailer";
-import { MailTemplates } from "./enums/mailTemplates.js";
-import { getTemplateHtml } from "./templateService.js";
+const nodemailer = require("nodemailer");
+const { MailTemplates } = require("../enums/mailTemplates");
+const { getTemplateHtml } = require("./templateService");
 
 const {
   MAIL_HOST,
@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
   tls: { minVersion: "TLSv1.2" },
 });
 
-export async function verifyMailer() {
+async function verifyMailer() {
   if (MAIL_ENABLED !== "true") {
     console.log("📪 MAIL_ENABLED=false → no se enviarán correos.");
     return;
@@ -39,7 +39,7 @@ export async function verifyMailer() {
 /**
  * Envia un correo SOLO con los comercios añadidos
  */
-export async function sendDiffEmail({ added }) {
+async function sendDiffEmail({ added }) {
   if (MAIL_ENABLED !== "true") {
     console.log("📪 MAIL_ENABLED=false → skip");
     return;
@@ -77,3 +77,5 @@ export async function sendDiffEmail({ added }) {
     console.error("❌ Error enviando correo (SMTP):", e.message);
   }
 }
+
+module.exports = { verifyMailer, sendDiffEmail };

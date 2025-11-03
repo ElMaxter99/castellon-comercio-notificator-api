@@ -1,11 +1,16 @@
-import { scrapeComercios } from "./scraper/index.js";
-import { getComercios, saveComercios, saveLastUpdate, addHistoryEntry, updateSectorsFromComercios } from "./services/redisService";
+const { scrapeComercios } = require("./scraper/index");
+const {
+  getComercios,
+  saveComercios,
+  saveLastUpdate,
+  addHistoryEntry,
+  updateSectorsFromComercios,
+} = require("./services/redisService");
+const { diffComercios } = require("./utils/diff");
+const { sendDiffEmail } = require("./services/mailService");
+const cron = require("node-cron");
 
-import { diffComercios } from "./utils/diff.js";
-import { sendDiffEmail } from "./services/mailService.js";
-import cron from "node-cron";
-
-export async function runScrape(manual = false) {
+async function runScrape(manual = false) {
   console.log(manual ? "🧭 Scrapeo manual iniciado..." : "⏰ Ejecutando scrapeo automático...");
 
   try {
@@ -22,7 +27,9 @@ export async function runScrape(manual = false) {
         removed: diff.removed,
         total: nuevos.length,
       });
+
       await updateSectorsFromComercios(nuevos);
+
       if (diff.added.length > 0) {
         console.log(`📬 Nuevos comercios detectados (${diff.added.length}), enviando correo...`);
         await sendDiffEmail({
@@ -42,7 +49,9 @@ export async function runScrape(manual = false) {
   }
 }
 
-export function startCron() {
+function startCron() {
   console.log("🕓 Cron programado cada 5 minutos");
   cron.schedule("*/5 * * * *", () => runScrape(false));
 }
+
+module.exports = { runScrape, startCron };

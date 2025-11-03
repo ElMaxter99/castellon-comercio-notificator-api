@@ -1,10 +1,6 @@
 import { scrapeComercios } from "./scraper/index.js";
-import {
-  getComercios,
-  saveComercios,
-  saveLastUpdate,
-  addHistoryEntry,
-} from "./services/redisService.js";
+import { getComercios, saveComercios, saveLastUpdate, addHistoryEntry, updateSectorsFromComercios } from "./services/redisService";
+
 import { diffComercios } from "./utils/diff.js";
 import { sendDiffEmail } from "./services/mailService.js";
 import cron from "node-cron";
@@ -26,7 +22,7 @@ export async function runScrape(manual = false) {
         removed: diff.removed,
         total: nuevos.length,
       });
-
+      await updateSectorsFromComercios(nuevos);
       if (diff.added.length > 0) {
         console.log(`📬 Nuevos comercios detectados (${diff.added.length}), enviando correo...`);
         await sendDiffEmail({

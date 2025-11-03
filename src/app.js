@@ -3,16 +3,17 @@ const comerciosRouter = require("./routes/comercios");
 const { startCron } = require("./cron");
 const { redis } = require("./config/redis");
 const { verifyMailer } = require("./services/mailService");
+const requestLogger = require("./middleware/logger");
 
 const app = express();
 app.use(express.json());
 
+app.use(requestLogger);
+
 const port = process.env.PORT || 12001;
 
-// Rutas principales
 app.use("/api/comercios", comerciosRouter);
 
-// Estado general de la API
 app.get("/api/status", async (req, res) => {
   try {
     const redisStatus = await redis.ping();

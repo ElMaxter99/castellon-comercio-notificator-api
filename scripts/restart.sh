@@ -11,10 +11,10 @@ echo "🔄 Reiniciando contenedores de Castellón Comercios API..."
 cd "$(dirname "$0")/.." || exit 1
 
 # Detener los contenedores (sin eliminar datos)
-sudo docker compose down
+docker compose down
 
 # Iniciar nuevamente en modo background
-sudo docker compose up -d
+docker compose up -d
 
 echo "✅ Aplicación reiniciada correctamente."
-sudo docker compose ps
+docker compose ps

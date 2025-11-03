@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const { MailTemplates } = require("../enums/mailTemplates");
 const { getTemplateHtml } = require("./templateService");
+const logger = require("../utils/logger");
 
 const {
   MAIL_HOST,
@@ -25,14 +26,19 @@ const transporter = nodemailer.createTransport({
 
 async function verifyMailer() {
   if (MAIL_ENABLED !== "true") {
-    console.log("📪 MAIL_ENABLED=false → no se enviarán correos.");
+    logger.warn("MAIL_ENABLED=false → no se enviarán correos", {
+      context: "MAIL",
+    });
     return;
   }
   try {
     await transporter.verify();
-    console.log(`📧 SMTP OK (${MAIL_HOST}:${MAIL_PORT}, secure=${secure})`);
+    logger.success("SMTP verificado correctamente", {
+      context: "MAIL",
+      meta: { host: MAIL_HOST, port: MAIL_PORT, secure },
+    });
   } catch (e) {
-    console.error("❌ SMTP verify falló:", e.message);
+    logger.error("SMTP verify falló", { context: "MAIL", meta: e });
   }
 }
 
@@ -41,11 +47,11 @@ async function verifyMailer() {
  */
 async function sendDiffEmail({ added }) {
   if (MAIL_ENABLED !== "true") {
-    console.log("📪 MAIL_ENABLED=false → skip");
+    logger.warn("MAIL_ENABLED=false → skip", { context: "MAIL" });
     return;
   }
   if (!added || added.length === 0) {
-    console.log("ℹ️ Ningún comercio nuevo que notificar.");
+    logger.info("Ningún comercio nuevo que notificar", { context: "MAIL" });
     return;
   }
 
@@ -72,9 +78,12 @@ async function sendDiffEmail({ added }) {
       subject,
       html,
     });
-    console.log(`📧 Correo enviado (${added.length} nuevos comercios) ✅`);
+    logger.success("Correo enviado", {
+      context: "MAIL",
+      meta: { added: added.length, to: MAIL_TO },
+    });
   } catch (e) {
-    console.error("❌ Error enviando correo (SMTP):", e.message);
+    logger.error("Error enviando correo (SMTP)", { context: "MAIL", meta: e });
   }
 }
 

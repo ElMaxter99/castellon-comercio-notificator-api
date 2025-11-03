@@ -1,9 +1,9 @@
-import axios from "axios";
-import * as cheerio from "cheerio";
+const axios = require("axios");
+const cheerio = require("cheerio");
 
 const URL = "http://bonoscastellodelaplana.es/establecimientos-adheridos-al-programa";
 
-export async function scrapeComercios() {
+async function scrapeComercios() {
   const { data: html } = await axios.get(URL, {
     headers: { "User-Agent": "Mozilla/5.0" },
   });
@@ -34,3 +34,5 @@ export async function scrapeComercios() {
 
   return comercios;
 }
+
+module.exports = { scrapeComercios };

@@ -1,4 +1,4 @@
-import Redis from "ioredis";
+const Redis = require("ioredis");
 
 const {
   REDIS_URL,
@@ -15,7 +15,7 @@ const connectionUri =
 
 console.log(`[${NODE_ENV}] 🔧 Conectando a Redis → ${connectionUri}`);
 
-export const redis = new Redis(connectionUri, {
+const redis = new Redis(connectionUri, {
   db: NODE_ENV === "prod" ? 0 : NODE_ENV === "staging" ? 1 : 2,
   retryStrategy: (times) => Math.min(times * 50, 2000),
 });
@@ -28,5 +28,11 @@ redis.on("error", (err) => {
   console.error(`❌ Error de conexión a Redis:`, err.message);
 });
 
-export const ENV = NODE_ENV;
-export const NAMESPACE = REDIS_NAMESPACE;
+const ENV = NODE_ENV;
+const NAMESPACE = REDIS_NAMESPACE;
+
+module.exports = {
+  redis,
+  ENV,
+  NAMESPACE,
+};

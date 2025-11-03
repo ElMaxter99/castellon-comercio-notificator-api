@@ -1,6 +1,6 @@
-import express from "express";
-import { getComercios, getLastUpdate, getHistory } from "../services/redisService";
-import { runScrape } from "../cron";
+const express = require("express");
+const { getComercios, getLastUpdate, getHistory } = require("../services/redisService");
+const { runScrape } = require("../cron");
 
 const router = express.Router();
 
@@ -8,8 +8,13 @@ const router = express.Router();
  * Obtener comercios actuales
  */
 router.get("/", async (req, res) => {
-  const data = await getComercios();
-  res.json(data);
+  try {
+    const data = await getComercios();
+    res.json(data);
+  } catch (err) {
+    console.error("Error obteniendo comercios:", err.message);
+    res.status(500).json({ error: "Error obteniendo comercios" });
+  }
 });
 
 /**
@@ -41,6 +46,7 @@ router.get("/history", async (req, res) => {
     const history = await getHistory();
     res.json(history);
   } catch (err) {
+    console.error("Error obteniendo histórico:", err.message);
     res.status(500).json({ error: "Error obteniendo histórico" });
   }
 });
@@ -53,8 +59,9 @@ router.post("/force-scrape", async (req, res) => {
     await runScrape(true);
     res.json({ ok: true, message: "Scrapeo manual completado." });
   } catch (err) {
+    console.error("Error ejecutando scrapeo manual:", err.message);
     res.status(500).json({ ok: false, error: err.message });
   }
 });
 
-export default router;
+module.exports = router;

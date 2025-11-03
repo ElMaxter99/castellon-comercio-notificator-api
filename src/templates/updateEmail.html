@@ -3,136 +3,69 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Actualización de Comercios - Bonos Castelló</title>
+  <title>Actualización de Comercios</title>
   <style>
     body {
-      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f7f8fa;
-      margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
+      color: #333;
+      background-color: #fafafa;
+      padding: 20px;
+      line-height: 1.6;
     }
 
-    .container {
-      max-width: 700px;
-      margin: 40px auto;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-
-    header {
-      background: linear-gradient(135deg, #0055a5, #0078d4);
-      color: white;
-      padding: 20px 30px;
-      text-align: center;
-    }
-
-    header img {
-      height: 50px;
-      margin-bottom: 8px;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: 0.5px;
-    }
-
-    .content {
-      padding: 30px;
-    }
-
-    .summary {
-      background: #e8f3ff;
-      border-left: 4px solid #0078d4;
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 15px;
+    h1 {
+      color: #0066cc;
     }
 
     .section {
-      margin-bottom: 30px;
-    }
-
-    h2 {
-      color: #0055a5;
-      font-size: 18px;
-      margin-bottom: 10px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      padding: 15px;
     }
 
     ul {
-      list-style: none;
-      padding-left: 0;
-      margin: 0;
-    }
-
-    li {
-      border-bottom: 1px solid #eee;
-      padding: 8px 0;
-    }
-
-    .sector {
-      color: #888;
-      font-size: 14px;
-    }
-
-    .address {
-      color: #666;
-      font-size: 13px;
-    }
-
-    footer {
-      background-color: #f0f0f0;
-      color: #777;
-      text-align: center;
-      font-size: 13px;
-      padding: 15px;
+      padding-left: 20px;
     }
 
     a.button {
       display: inline-block;
-      background: #0078d4;
-      color: white;
+      background-color: #0066cc;
+      color: #fff !important;
       padding: 10px 20px;
       border-radius: 6px;
       text-decoration: none;
-      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #888;
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <img src="http://bonoscastellodelaplana.es/img/logo.png" alt="Bonos Castelló" />
-      <h1>Actualización de Comercios Adheridos</h1>
-    </header>
+  <h1>📰 Actualización de Comercios Adheridos</h1>
+  <p>Fecha: <strong>{{date}}</strong></p>
 
-    <div class="content">
-      <div class="summary">
-        <strong>{{totalChanges}}</strong> cambios detectados el <strong>{{date}}</strong>.
-      </div>
+  <p>Se han detectado <strong>{{totalChanges}}</strong> cambios:</p>
 
-      {{addedSection}}
+  {{addedSection}}
+  {{removedSection}}
+  {{noChangesMessage}}
 
-      {{removedSection}}
+  <p>
+    Puedes consultar el listado completo de comercios en:
+    <br />
+    <a class="button" href="{{frontendUrl}}">Ver Comercios</a>
+  </p>
 
-      {{noChangesMessage}}
-
-      <div style="text-align:center;margin-top:30px;">
-        <a href="{{frontendUrl}}" class="button">Ver todos los comercios</a>
-      </div>
-    </div>
-
-    <footer>
-      Bonos Castelló · Información automatizada<br />
-      <a href="http://bonoscastellodelaplana.es" style="color:#0078d4;text-decoration:none;">
-        bonoscastellodelaplana.es
-      </a>
-    </footer>
-  </div>
+  <footer>
+    <p>Este correo ha sido generado automáticamente por Aamoros .</p>
+  </footer>
 </body>
 
 </html>

@@ -1,32 +1,32 @@
-import { redis, ENV, NAMESPACE } from "../config/redis";
+const { redis, ENV, NAMESPACE } = require("../config/redis");
 
 function key(name) {
   return `${ENV}:${NAMESPACE}:${name}`;
 }
 
-export async function saveComercios(comercios) {
+async function saveComercios(comercios) {
   await redis.set(key("comercios"), JSON.stringify(comercios));
 }
 
-export async function getComercios() {
+async function getComercios() {
   const data = await redis.get(key("comercios"));
   return data ? JSON.parse(data) : [];
 }
 
-export async function deleteComercios() {
+async function deleteComercios() {
   await redis.del(key("comercios"));
 }
 
-export async function saveLastUpdate(date = new Date()) {
+async function saveLastUpdate(date = new Date()) {
   await redis.set(key("last-update"), date.toISOString());
 }
 
-export async function getLastUpdate() {
+async function getLastUpdate() {
   const date = await redis.get(key("last-update"));
   return date ? new Date(date) : null;
 }
 
-export async function addHistoryEntry({ added, removed, total }) {
+async function addHistoryEntry({ added, removed, total }) {
   const entry = {
     timestamp: new Date().toISOString(),
     added: added.map((c) => c.name),
@@ -42,9 +42,18 @@ export async function addHistoryEntry({ added, removed, total }) {
   await redis.set(keyHistory, JSON.stringify(history));
 }
 
-export async function getHistory() {
+async function getHistory() {
   const data = await redis.get(key("history"));
   return data ? JSON.parse(data) : [];
 }
 
-export default redis;
+module.exports = {
+  redis,
+  saveComercios,
+  getComercios,
+  deleteComercios,
+  saveLastUpdate,
+  getLastUpdate,
+  addHistoryEntry,
+  getHistory,
+};

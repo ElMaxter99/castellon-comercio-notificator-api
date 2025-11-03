@@ -20,7 +20,6 @@ export async function runScrape(manual = false) {
     if (diff.added.length || diff.removed.length) {
       console.log("🔄 Cambios detectados, actualizando Redis e histórico...");
 
-      // Guardar los cambios en Redis
       await saveComercios(nuevos);
       await addHistoryEntry({
         added: diff.added,
@@ -28,12 +27,11 @@ export async function runScrape(manual = false) {
         total: nuevos.length,
       });
 
-      // 📩 Enviar email solo si hay nuevos comercios añadidos
       if (diff.added.length > 0) {
         console.log(`📬 Nuevos comercios detectados (${diff.added.length}), enviando correo...`);
         await sendDiffEmail({
           added: diff.added,
-          removed: [], // 🔇 no notificamos eliminados
+          removed: diff.removed,
         });
       } else {
         console.log("ℹ️ No hay nuevos comercios para notificar por correo.");

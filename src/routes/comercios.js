@@ -5,6 +5,7 @@ const {
   getHistory,
   getSectors,
 } = require("../services/redisService");
+const { searchComercios } = require("../services/comercioSearchService");
 const { runScrape } = require("../cron");
 const logger = require("../utils/logger");
 
@@ -84,24 +85,27 @@ router.post("/force-scrape", async (req, res) => {
 
 router.get("/filter", async (req, res) => {
   try {
-    const { name, sector } = req.query;
-    const comercios = await getComercios();
+    const {
+      name,
+      street,
+      sector,
+      sectors,
+      page,
+      pageSize,
+      includeLegend,
+    } = req.query;
 
-    let filtered = comercios;
+    const result = await searchComercios({
+      name,
+      street,
+      sector,
+      sectors,
+      page,
+      pageSize,
+      includeLegend: includeLegend !== "false",
+    });
 
-    if (sector) {
-      filtered = filtered.filter(c =>
-        c.sector?.toLowerCase().includes(sector.toLowerCase())
-      );
-    }
-
-    if (name) {
-      filtered = filtered.filter(c =>
-        c.name?.toLowerCase().includes(name.toLowerCase())
-      );
-    }
-
-    res.json(filtered);
+    res.json(result);
   } catch (err) {
     logger.error("Error filtrando comercios", {
       context: "ROUTE:FILTER",

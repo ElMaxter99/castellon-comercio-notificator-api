@@ -1,35 +1,33 @@
 # 🏙️ Castellón Comercio Notificator API
 
-API automatizada que monitoriza los **comercios adheridos** al programa de bonos del Ayuntamiento de Castellón.  
-Se encarga de **scrapear periódicamente** la web oficial, **detectar cambios**, **enviar notificaciones por correo** y **mantener un histórico completo de actualizaciones**.
+## 🌟 Finalidad del proyecto
+Proyecto independiente sin ánimo de lucro. Esta aplicación nace por amor al arte para ofrecer una perspectiva alternativa, positiva y centrada en los comercios adheridos al programa oficial. Los datos se obtienen de la iniciativa municipal disponible en [bonoscastellodelaplana.es](https://bonoscastellodelaplana.es) y se muestran aquí sin ningún fin comercial.
+
+El servicio se encarga de monitorizar periódicamente la web oficial de bonos municipales, detectar cambios, almacenar el histórico en Redis y disparar notificaciones cuando aparecen nuevas altas o bajas en el listado de comercios.
 
 ---
 
 ## 🚀 Características principales
-
-- 🔁 Scrapeo automático cada 5 minutos (configurable con `cron`)
-- 💾 Almacenamiento en **Redis** (con separación por entorno)
-- 🕒 Histórico completo de cambios (comercios añadidos o eliminados)
-- ✉️ Notificaciones automáticas por email cuando hay diferencias
-- 📦 API REST para consultar:
-  - Comercios actuales
-  - Estado del sistema
-  - Histórico completo de actualizaciones
-  - Forzar un nuevo scrapeo manualmente
+- 🔁 Scrapeo automático y programable mediante `cron`.
+- 💾 Almacenamiento en **Redis** con separación por entorno (`dev`, `staging`, `prod`).
+- 🕒 Histórico completo de altas/bajas para auditar la evolución del programa.
+- ✉️ Notificaciones automáticas por correo electrónico cuando se detectan cambios.
+- 📦 API REST para consultar el estado del sistema, los comercios vigentes y el histórico de variaciones.
 
 ---
 
-## 🧩 Requisitos
-
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
-- (Opcional) Node.js ≥ 22.12.0 si deseas ejecutarlo sin Docker
+## 🧱 Arquitectura
+| Componente | Descripción |
+|------------|-------------|
+| **Express API** | Expone endpoints REST `/api/comercios/**` para consumo externo. |
+| **Scraper (cron)** | Tarea programada que visita la web oficial, parsea con `cheerio` y normaliza los datos. |
+| **Redis** | Cachea la información actual y guarda snapshots históricos. |
+| **Mailer** | Notifica por SMTP cuando se detectan diferencias entre ejecuciones consecutivas. |
 
 ---
 
-## ⚙️ Variables de entorno (`.env`)
-
-Ejemplo de configuración:
+## ⚙️ Configuración de entorno
+Crea un archivo `.env` en la raíz del proyecto con valores similares a:
 
 ```bash
 # App
@@ -53,29 +51,44 @@ MAIL_ENABLED=true
 
 # URL del frontend (opcional)
 FRONTEND_URL=http://localhost:4200
-
 ```
-*Si usas Gmail, debes generar una App Password (no usar la contraseña normal).
+> 💡 Si utilizas Gmail, genera una contraseña de aplicación; no uses la contraseña habitual.
 
-## 🐳 Ejecución con Docker Compose
+---
 
-Construir y arrancar:
+## 🐳 Puesta en marcha con Docker Compose
 ```bash
 docker compose up --build
 ```
+Esto levantará el API, Redis y ejecutará el cron de scrapeo en segundo plano.
 
-Detener y limpiar:
+Para detener y limpiar los contenedores:
 ```bash
 docker compose down -v
 ```
 
+---
 
-## 🌐 Endpoints disponibles
+## 🧪 Ejecución local sin Docker
+1. Asegúrate de tener **Node.js ≥ 22.12.0** y **Redis** accesible.
+2. Instala dependencias:
+   ```bash
+   npm install
+   ```
+3. Arranca el servicio:
+   ```bash
+   npm start
+   ```
 
-### 1️⃣ GET /api/comercios
-Devuelve todos los comercios actuales almacenados en Redis.
+---
 
-Ejemplo de respuesta:
+## 🌐 Uso de la API
+Todas las rutas están prefijadas con `/api/comercios`.
+
+### 1️⃣ `GET /api/comercios`
+Devuelve el listado actual de comercios disponibles.
+
+**Ejemplo de respuesta**
 ```json
 [
   {
@@ -83,31 +96,28 @@ Ejemplo de respuesta:
     "sector": "Alimentación",
     "phone": "964 123 456",
     "address": "C/ Mayor, 12",
-    "img": "http://bonoscastellodelaplana.es/uploads/panaderia.jpg",
+    "img": "https://bonoscastellodelaplana.es/uploads/panaderia.jpg",
     "mapsUrl": "https://goo.gl/maps/xxxx"
-  },
-  ...
+  }
 ]
-
 ```
 
-### 2️⃣ GET /api/comercios/status
-Devuelve información sobre el estado del sistema y la última actualización.
+### 2️⃣ `GET /api/comercios/status`
+Informa sobre el entorno activo, el número de comercios y la fecha del último scrapeo.
 
-Ejemplo de respuesta:
+**Ejemplo de respuesta**
 ```json
 {
   "environment": "staging",
   "total": 248,
   "lastUpdate": "2025-11-03T14:55:22.134Z"
 }
-
 ```
 
-### 3️⃣ GET /api/comercios/history
-Devuelve todos los comercios actuales almacenados en Redis.
+### 3️⃣ `GET /api/comercios/history`
+Devuelve el histórico completo de diferencias detectadas entre ejecuciones.
 
-Ejemplo de respuesta:
+**Ejemplo de respuesta**
 ```json
 [
   {
@@ -115,26 +125,39 @@ Ejemplo de respuesta:
     "added": ["Librería Roma", "Zapatería Central"],
     "removed": ["Bar Pepe"],
     "countAfter": 248
-  },
-  {
-    "timestamp": "2025-11-02T18:00:01.000Z",
-    "added": ["Floristería Sol"],
-    "removed": [],
-    "countAfter": 246
   }
 ]
-
 ```
 
-### 4️⃣ POST /api/comercios/force-scrape
-Fuerza un scrapeo manual inmediato, sin esperar al cron automático.
+### 4️⃣ `POST /api/comercios/force-scrape`
+Fuerza un nuevo scrapeo manual inmediato sin esperar al cron.
 
-Ejemplo de respuesta:
+**Ejemplo de respuesta**
 ```json
 {
   "ok": true,
   "message": "Scrapeo manual completado."
 }
-
-
 ```
+
+**Notas**
+- El endpoint requiere que el proceso de scraper esté habilitado.
+- Se recomienda proteger esta ruta tras autenticación o mediante token si se expone públicamente.
+
+---
+
+## 🛡️ Buenas prácticas y recomendaciones
+- Ejecutar el cron en intervalos razonables para no sobrecargar la web origen.
+- Configurar alertas en caso de errores de conexión a Redis o de envío SMTP.
+- Asegurar el despliegue tras HTTPS y restringir IPs si se expone a Internet.
+- Mantener actualizadas las dependencias y revisar los logs rotativos generados por `rotating-file-stream`.
+
+---
+
+## 🤝 Contribuciones
+¡Las sugerencias son bienvenidas! Abre un issue o una pull request con tu propuesta.
+
+---
+
+## 📝 Licencia
+Uso exclusivamente informativo y sin fines comerciales. Respeta siempre las condiciones de uso de los datos oficiales del Ayuntamiento de Castellón.

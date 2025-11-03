@@ -4,6 +4,7 @@ const { startCron } = require("./cron");
 const { redis } = require("./config/redis");
 const { verifyMailer } = require("./services/mailService");
 const requestLogger = require("./middleware/logger");
+const logger = require("./utils/logger");
 
 const app = express();
 app.use(express.json());
@@ -37,13 +38,20 @@ app.get("/api/status", async (req, res) => {
     const redisStatus = await redis.ping();
     res.json({ ok: true, redis: redisStatus, message: "API running" });
   } catch (e) {
+    logger.error("Redis unreachable desde /api/status", {
+      context: "APP",
+      meta: e,
+    });
     res.status(500).json({ ok: false, error: "Redis unreachable" });
   }
 });
 
 app.listen(port, async () => {
-  console.log(`🚀 API levantada en http://localhost:${port}`);
+  logger.success("API levantada", {
+    context: "APP",
+    meta: { port },
+  });
   await verifyMailer();
-  console.log("⏱️  Iniciando cron de scrapeo cada 5 min...");
+  logger.info("Iniciando cron de scrapeo cada 5 min", { context: "APP" });
   await startCron();
 });

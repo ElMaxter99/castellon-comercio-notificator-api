@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const logger = require("../utils/logger");
 
 const logDir = path.join(__dirname, "../../logs");
 if (!fs.existsSync(logDir)) {
@@ -16,12 +17,27 @@ function requestLogger(req, res, next) {
     req.ip ||
     "unknown";
 
+  const baseLogEntry = {
+    method: req.method,
+    url: req.originalUrl,
+    ip,
+    userAgent: req.headers["user-agent"],
+  };
+
+  logger.request(`${req.method} ${req.originalUrl}`, {
+    context: "HTTP",
+    meta: baseLogEntry,
+  });
+
   const logEntry = `[${timestamp}] ${req.method} ${req.originalUrl} | IP: ${ip}\n`;
 
-  process.stdout.write(logEntry);
-
   fs.appendFile(logFile, logEntry, (err) => {
-    if (err) console.error("KO Error escribiendo log:", err.message);
+    if (err) {
+      logger.error("KO Error escribiendo log", {
+        context: "HTTP",
+        meta: err,
+      });
+    }
   });
 
   next();

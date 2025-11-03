@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
-import { MailTemplates } from "./enums/mailTemplates.js";
-import { getTemplateHtml } from "./templateService.js";
+import { MailTemplates } from "./enums/mailTemplates";
+import { getTemplateHtml } from "./templateService";
 
 const {
   MAIL_HOST,
@@ -19,13 +19,8 @@ const transporter = nodemailer.createTransport({
   host: MAIL_HOST,
   port: Number(MAIL_PORT),
   secure,
-  auth: {
-    user: MAIL_USER,
-    pass: MAIL_PASS,
-  },
-  tls: {
-    minVersion: "TLSv1.2",
-  },
+  auth: { user: MAIL_USER, pass: MAIL_PASS },
+  tls: { minVersion: "TLSv1.2" },
 });
 
 export async function verifyMailer() {
@@ -33,27 +28,20 @@ export async function verifyMailer() {
     console.log("📪 MAIL_ENABLED=false → no se enviarán correos.");
     return;
   }
-
   try {
     await transporter.verify();
     console.log(`📧 SMTP OK (${MAIL_HOST}:${MAIL_PORT}, secure=${secure})`);
-  } catch (err) {
-    console.error("❌ SMTP verify falló:", err.message);
+  } catch (e) {
+    console.error("❌ SMTP verify falló:", e.message);
   }
 }
 
 export async function sendDiffEmail({ added, removed }) {
-  if (MAIL_ENABLED !== "true") {
-    console.log("📪 MAIL_ENABLED=false → correo desactivado");
-    return;
-  }
-
+  if (MAIL_ENABLED !== "true") { console.log("📪 MAIL_ENABLED=false → skip"); return; }
   if (!added.length && !removed.length) return;
 
   const html = getTemplateHtml(MailTemplates.UPDATE_COMERCIOS, {
-    added,
-    removed,
-    frontendUrl: FRONTEND_URL,
+    added, removed, frontendUrl: FRONTEND_URL,
   });
 
   try {
@@ -63,9 +51,8 @@ export async function sendDiffEmail({ added, removed }) {
       subject: "📰 Actualización de Comercios Adheridos",
       html,
     });
-
-    console.log("📧 Correo de actualización enviado correctamente ✅");
-  } catch (err) {
-    console.error("❌ Error enviando correo:", err.message);
+    console.log("📧 Correo enviado correctamente ✅");
+  } catch (e) {
+    console.error("❌ Error enviando correo (SMTP):", e.message);
   }
 }

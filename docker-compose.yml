@@ -19,6 +19,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: castellon-redis
+    env_file: .env
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
     restart: always
     volumes:
@@ -26,7 +27,7 @@ services:
     networks:
       - internal
     expose:
-      - "6379" # solo visible dentro del stack
+      - "6379"
 
 volumes:
   redis_data:

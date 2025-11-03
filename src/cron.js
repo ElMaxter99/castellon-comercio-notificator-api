@@ -1,7 +1,7 @@
-import { scrapeComercios } from "./scraper/index.js";
-import { getComercios, saveComercios, saveLastUpdate, addHistoryEntry } from "./services/redisService.js";
-import { diffComercios } from "./utils/diff.js";
-import { sendDiffEmail } from "./services/mailService.js";
+import { scrapeComercios } from "./scraper/index";
+import { getComercios, saveComercios, saveLastUpdate, addHistoryEntry } from "./services/redisService";
+import { diffComercios } from "./utils/diff";
+import { sendDiffEmail } from "./services/mailService";
 import cron from "node-cron";
 
 export async function runScrape(manual = false) {

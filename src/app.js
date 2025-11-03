@@ -1,7 +1,8 @@
 import express from "express";
-import comerciosRouter from "./routes/comercios.js";
-import { startCron } from "./cron.js";
-import { redis } from "./config/redis.js";
+import comerciosRouter from "./routes/comercios";
+import { startCron } from "./cron";
+import { redis } from "./config/redis";
+import { verifyMailer } from "./services/mailService";
 
 const app = express();
 app.use(express.json());
@@ -21,6 +22,7 @@ app.get("/api/status", async (req, res) => {
 
 app.listen(port, async () => {
   console.log(`🚀 API levantada en http://localhost:${port}`);
+  await verifyMailer();
   console.log("⏱️  Iniciando cron de scrapeo cada 5 min...");
   await startCron();
 });

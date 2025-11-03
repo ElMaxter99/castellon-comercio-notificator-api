@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { MailTemplates } from "./enums/mailTemplates.js";
+import { MailTemplates } from "./enums/mailTemplates";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const templatesDir = path.join(__dirname, "../templates");

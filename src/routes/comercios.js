@@ -1,6 +1,6 @@
 import express from "express";
-import { getComercios, getLastUpdate, getHistory } from "../services/redisService.js";
-import { runScrape } from "../cron.js";
+import { getComercios, getLastUpdate, getHistory } from "../services/redisService";
+import { runScrape } from "../cron";
 
 const router = express.Router();
 

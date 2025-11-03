@@ -1,6 +1,6 @@
-const nodemailer = require("nodemailer");
-const { MailTemplates } = require("../enums/mailTemplates");
-const { getTemplateHtml } = require("./templateService");
+import nodemailer from "nodemailer";
+import { MailTemplates } from "./enums/mailTemplates.js";
+import { getTemplateHtml } from "./templateService.js";
 
 const {
   MAIL_HOST,
@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
   tls: { minVersion: "TLSv1.2" },
 });
 
-async function verifyMailer() {
+export async function verifyMailer() {
   if (MAIL_ENABLED !== "true") {
     console.log("📪 MAIL_ENABLED=false → no se enviarán correos.");
     return;
@@ -36,33 +36,44 @@ async function verifyMailer() {
   }
 }
 
-async function sendDiffEmail({ added, removed }) {
+/**
+ * Envia un correo SOLO con los comercios añadidos
+ */
+export async function sendDiffEmail({ added }) {
   if (MAIL_ENABLED !== "true") {
     console.log("📪 MAIL_ENABLED=false → skip");
     return;
   }
-  if (!added.length && !removed.length) return;
+  if (!added || added.length === 0) {
+    console.log("ℹ️ Ningún comercio nuevo que notificar.");
+    return;
+  }
+
+  const now = new Date();
+  const formattedDate = now.toLocaleString("es-ES", {
+    timeZone: "Europe/Madrid",
+    dateStyle: "full",
+    timeStyle: "short",
+  });
+
+  const subject = `🆕 ${added.length} nuevo${added.length > 1 ? "s" : ""} comercio${added.length > 1 ? "s" : ""} adherido${added.length > 1 ? "s" : ""} – ${formattedDate}`;
 
   const html = getTemplateHtml(MailTemplates.UPDATE_COMERCIOS, {
     added,
-    removed,
+    removed: [],
     frontendUrl: FRONTEND_URL,
+    date: formattedDate,
   });
 
   try {
     await transporter.sendMail({
       from: `"Bonos Castelló API" <${MAIL_USER}>`,
       to: MAIL_TO,
-      subject: "📰 Actualización de Comercios Adheridos",
+      subject,
       html,
     });
-    console.log("📧 Correo enviado correctamente ✅");
+    console.log(`📧 Correo enviado (${added.length} nuevos comercios) ✅`);
   } catch (e) {
     console.error("❌ Error enviando correo (SMTP):", e.message);
   }
 }
-
-module.exports = {
-  verifyMailer,
-  sendDiffEmail,
-};

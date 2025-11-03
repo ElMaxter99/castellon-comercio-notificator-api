@@ -16,48 +16,45 @@ function renderTemplate(templateName, vars = {}) {
 function getTemplateHtml(templateType, data) {
   switch (templateType) {
     case MailTemplates.UPDATE_COMERCIOS: {
-      const { added = [], removed = [], frontendUrl } = data;
-      const totalChanges = added.length + removed.length;
-      const date = new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" });
+      const { added = [], frontendUrl, date } = data;
+      const totalChanges = added.length;
 
-      const addedSection = added.length
-        ? added
+      const grouped = added.reduce((acc, comercio) => {
+        const sector = comercio.sector || "Sin sector";
+        if (!acc[sector]) acc[sector] = [];
+        acc[sector].push(comercio);
+        return acc;
+      }, {});
+
+      const groupedSections = Object.entries(grouped)
+        .map(([sector, comercios]) => {
+          const items = comercios
             .map(
               (c) => `
                 <li>
                   <strong>${c.name}</strong><br/>
-                  <span class="sector">${c.sector || "Sin sector"}</span><br/>
-                  <span class="address">${c.address || ""}</span>
+                  <span class="address">${c.address || ""}</span><br/>
+                  ${c.phone ? `<span class="phone">📞 ${c.phone}</span>` : ""}
                 </li>`
             )
-            .join("")
-        : "";
+            .join("");
 
-      const removedSection = removed.length
-        ? removed
-            .map(
-              (c) => `
-                <li>
-                  <strong>${c.name}</strong><br/>
-                  <span class="sector">${c.sector || "Sin sector"}</span><br/>
-                  <span class="address">${c.address || ""}</span>
-                </li>`
-            )
-            .join("")
-        : "";
+          return `
+            <div class="section">
+              <h2>🟢 ${sector} (${comercios.length})</h2>
+              <ul>${items}</ul>
+            </div>`;
+        })
+        .join("");
 
       return renderTemplate("updateEmail.html", {
         date,
         totalChanges,
-        addedSection: addedSection
-          ? `<div class="section"><h2>🟢 Nuevos comercios (${added.length})</h2><ul>${addedSection}</ul></div>`
-          : "",
-        removedSection: removedSection
-          ? `<div class="section"><h2>🔴 Comercios eliminados (${removed.length})</h2><ul>${removedSection}</ul></div>`
-          : "",
+        addedSection: groupedSections,
+        removedSection: "",
         noChangesMessage:
-          !added.length && !removed.length
-            ? `<p>No se han detectado cambios en los comercios adheridos.</p>`
+          !added.length
+            ? `<p>No se han detectado nuevos comercios adheridos.</p>`
             : "",
         frontendUrl:
           frontendUrl ||

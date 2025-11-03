@@ -3,69 +3,86 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Actualización de Comercios</title>
+  <title>Actualización de Comercios Adheridos</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      color: #333;
-      background-color: #fafafa;
-      padding: 20px;
-      line-height: 1.6;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      margin: 0;
+      padding: 2rem;
+      color: #222;
+    }
+
+    .container {
+      background: white;
+      border-radius: 10px;
+      padding: 2rem;
+      max-width: 700px;
+      margin: 0 auto;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
-      color: #0066cc;
+      color: #2b6cb0;
+      text-align: center;
     }
 
-    .section {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-      padding: 15px;
+    .meta {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+
+    .sector-group {
+      margin-top: 1.5rem;
+      border-top: 1px solid #ddd;
+      padding-top: 1rem;
+    }
+
+    h2 {
+      color: #16a34a;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
     }
 
     ul {
-      padding-left: 20px;
+      list-style: none;
+      padding-left: 1rem;
     }
 
-    a.button {
-      display: inline-block;
-      background-color: #0066cc;
-      color: #fff !important;
-      padding: 10px 20px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
+    li {
+      margin-bottom: 0.8rem;
+    }
+
+    .address {
+      color: #555;
+    }
+
+    .phone {
+      color: #2563eb;
+      font-size: 0.9rem;
     }
 
     footer {
-      margin-top: 30px;
-      font-size: 0.9em;
-      color: #888;
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #777;
     }
   </style>
 </head>
 
 <body>
-  <h1>📰 Actualización de Comercios Adheridos</h1>
-  <p>Fecha: <strong>{{date}}</strong></p>
-
-  <p>Se han detectado <strong>{{totalChanges}}</strong> cambios:</p>
-
-  {{addedSection}}
-  {{removedSection}}
-  {{noChangesMessage}}
-
-  <p>
-    Puedes consultar el listado completo de comercios en:
-    <br />
-    <a class="button" href="{{frontendUrl}}">Ver Comercios</a>
-  </p>
-
-  <footer>
-    <p>Este correo ha sido generado automáticamente por Aamoros .</p>
-  </footer>
+  <div class="container">
+    <h1>🆕 Nuevos Comercios Adheridos</h1>
+    <p class="meta">Actualizado el {{date}}</p>
+    <p>Se han detectado <strong>{{totalChanges}}</strong> nuevos comercios adheridos al programa:</p>
+    {{addedSection}}
+    <footer>
+      <p>Consulta todos los comercios en <a href="{{frontendUrl}}">{{frontendUrl}}</a></p>
+    </footer>
+  </div>
 </body>
 
 </html>

@@ -1,15 +1,15 @@
-const { scrapeComercios } = require("./scraper");
-const {
+import { scrapeComercios } from "./scraper/index.js";
+import {
   getComercios,
   saveComercios,
   saveLastUpdate,
   addHistoryEntry,
-} = require("./services/redisService");
-const { diffComercios } = require("./utils/diff");
-const { sendDiffEmail } = require("./services/mailService");
-const cron = require("node-cron");
+} from "./services/redisService.js";
+import { diffComercios } from "./utils/diff.js";
+import { sendDiffEmail } from "./services/mailService.js";
+import cron from "node-cron";
 
-async function runScrape(manual = false) {
+export async function runScrape(manual = false) {
   console.log(manual ? "🧭 Scrapeo manual iniciado..." : "⏰ Ejecutando scrapeo automático...");
 
   try {
@@ -18,30 +18,37 @@ async function runScrape(manual = false) {
     const diff = diffComercios(antiguos, nuevos);
 
     if (diff.added.length || diff.removed.length) {
-      console.log("🔄 Cambios detectados, actualizando Redis, histórico y enviando correo...");
+      console.log("🔄 Cambios detectados, actualizando Redis e histórico...");
+
+      // Guardar los cambios en Redis
       await saveComercios(nuevos);
       await addHistoryEntry({
         added: diff.added,
         removed: diff.removed,
         total: nuevos.length,
       });
-      await sendDiffEmail(diff);
+
+      // 📩 Enviar email solo si hay nuevos comercios añadidos
+      if (diff.added.length > 0) {
+        console.log(`📬 Nuevos comercios detectados (${diff.added.length}), enviando correo...`);
+        await sendDiffEmail({
+          added: diff.added,
+          removed: [], // 🔇 no notificamos eliminados
+        });
+      } else {
+        console.log("ℹ️ No hay nuevos comercios para notificar por correo.");
+      }
     } else {
-      console.log("OK Sin cambios detectados.");
+      console.log("✅ Sin cambios detectados.");
     }
 
     await saveLastUpdate();
   } catch (err) {
-    console.error("KO Error en scrapeo:", err.message);
+    console.error("❌ Error en scrapeo:", err.message);
   }
 }
 
-function startCron() {
+export function startCron() {
   console.log("🕓 Cron programado cada 5 minutos");
   cron.schedule("*/5 * * * *", () => runScrape(false));
 }
-
-module.exports = {
-  runScrape,
-  startCron,
-};

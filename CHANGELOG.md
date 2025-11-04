@@ -1,4 +1,7 @@
 # Changelog
+## v1.0.1 - 2025-11-04
+### Correción
+- [Snyk] Security upgrade node from 22.12.0 to 25.1.0 #6
 
 ## v1.0.0 - 2025-11-03
 ### Agregado

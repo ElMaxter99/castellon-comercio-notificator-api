@@ -1,7 +1,7 @@
 # ==========
 # Base
 # ==========
-FROM node:22.12.0
+FROM node:22.21.1
 
 # Directorio de trabajo
 WORKDIR /usr/src/app

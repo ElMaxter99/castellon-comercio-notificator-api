@@ -7,6 +7,8 @@ const requestLogger = require("./middleware/logger");
 const logger = require("./utils/logger");
 
 const app = express();
+
+app.disable("x-powered-by");
 app.use(express.json());
 
 app.use((req, res, next) => {

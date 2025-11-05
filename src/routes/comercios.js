@@ -85,6 +85,14 @@ router.post("/force-scrape", async (req, res) => {
 router.get("/filter", async (req, res) => {
   try {
     const { name, sector } = req.query;
+
+    if (sector !== undefined && typeof sector !== "string") {
+      return res.status(400).json({ error: "El parámetro sector debe ser texto" });
+    }
+
+    if (name !== undefined && typeof name !== "string") {
+      return res.status(400).json({ error: "El parámetro name debe ser texto" });
+    }
     const comercios = await getComercios();
 
     let filtered = comercios;

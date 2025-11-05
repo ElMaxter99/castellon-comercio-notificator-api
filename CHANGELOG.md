@@ -1,4 +1,16 @@
 # Changelog
+
+## v1.0.2 - 2025-11-05
+### Agregado
+- Add in-memory rate limiter before request logging #10
+- Validate query parameter types in comercios filter route #12
+
+### Correción
+- [Snyk] Security upgrade nodemailer from 6.10.1 to 7.0.7 #7
+- [Snyk] Security upgrade node from 25.1.0 to 25.1.0-trixie-slim #8
+- Disable Express X-Powered-By header #9
+- Sanitize HTML in diff notification emails #11
+
 ## v1.0.1 - 2025-11-04
 ### Correción
 - [Snyk] Security upgrade node from 22.12.0 to 25.1.0 #6

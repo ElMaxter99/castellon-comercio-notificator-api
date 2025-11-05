@@ -6,17 +6,36 @@ const CLEANUP_INTERVAL_MS = WINDOW_MS * 5;
 
 const requestCounts = new Map();
 
-function extractClientIp(req) {
-  const forwarded = req.headers["x-forwarded-for"];
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
+function normalizeIp(ip) {
+  if (!ip || typeof ip !== "string") {
+    return null;
   }
-  return (
-    req.connection?.remoteAddress ||
-    req.ip ||
-    req.socket?.remoteAddress ||
-    "unknown"
-  );
+
+  const trimmed = ip.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  // Remove IPv6 prefix that Node can add for IPv4 addresses (e.g. ::ffff:127.0.0.1)
+  return trimmed.replace(/^::ffff:/i, "");
+}
+
+function extractClientIp(req) {
+  const candidates = [
+    req.ip,
+    req.connection?.remoteAddress,
+    req.socket?.remoteAddress,
+    req.connection?.socket?.remoteAddress,
+  ];
+
+  for (const candidate of candidates) {
+    const normalized = normalizeIp(candidate);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  return "unknown";
 }
 
 setInterval(() => {

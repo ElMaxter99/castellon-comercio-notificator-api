@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { MailTemplates } = require("../enums/mailTemplates");
+const { escapeHtml } = require("../utils/sanitize");
 
 const templatesDir = path.join(__dirname, "../templates");
 
@@ -32,23 +33,23 @@ function getTemplateHtml(templateType, data) {
             .map(
               (c) => `
                 <li>
-                  <strong>${c.name}</strong><br/>
-                  <span class="address">${c.address || ""}</span><br/>
-                  ${c.phone ? `<span class="phone">📞 ${c.phone}</span>` : ""}
+                  <strong>${escapeHtml(c.name)}</strong><br/>
+                  <span class="address">${escapeHtml(c.address)}</span><br/>
+                  ${c.phone ? `<span class="phone">📞 ${escapeHtml(c.phone)}</span>` : ""}
                 </li>`
             )
             .join("");
 
           return `
             <div class="section">
-              <h2>🟢 ${sector} (${comercios.length})</h2>
+              <h2>🟢 ${escapeHtml(sector)} (${comercios.length})</h2>
               <ul>${items}</ul>
             </div>`;
         })
         .join("");
 
       return renderTemplate("updateEmail.html", {
-        date,
+        date: escapeHtml(date),
         totalChanges,
         addedSection: groupedSections,
         removedSection: "",
@@ -57,8 +58,10 @@ function getTemplateHtml(templateType, data) {
             ? `<p>No se han detectado nuevos comercios adheridos.</p>`
             : "",
         frontendUrl:
-          frontendUrl ||
+          escapeHtml(
+            frontendUrl ||
           "http://bonoscastellodelaplana.es/establecimientos-adheridos-al-programa",
+          ),
       });
     }
 

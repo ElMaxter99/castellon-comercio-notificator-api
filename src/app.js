@@ -4,6 +4,7 @@ const { startCron } = require("./cron");
 const { redis } = require("./config/redis");
 const { verifyMailer } = require("./services/mailService");
 const requestLogger = require("./middleware/logger");
+const rateLimiter = require("./middleware/rateLimiter");
 const logger = require("./utils/logger");
 
 const app = express();
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(rateLimiter);
 app.use(requestLogger);
 
 const port = process.env.PORT || 12001;

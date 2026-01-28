@@ -1,7 +1,7 @@
 # ==========
 # Base
 # ==========
-FROM node:25.1.0-trixie-slim
+FROM node:25.5.0-trixie-slim
 
 # Directorio de trabajo
 WORKDIR /usr/src/app

@@ -28,7 +28,7 @@ El servicio se encarga de monitorizar periódicamente la web oficial de bonos mu
 | **Express API** | Expone endpoints REST `/api/comercios/**` para consumo externo. |
 | **Scraper (cron)** | Tarea programada que visita la web oficial, parsea con `cheerio` y normaliza los datos. |
 | **Redis** | Cachea la información actual y guarda snapshots históricos. |
-| **Mailer** | Notifica por SMTP cuando se detectan diferencias entre ejecuciones consecutivas. |
+| **Mailer** | Notifica por correo (SMTP o Resend, según `MAIL_PROVIDER`) cuando aparecen comercios nuevos. |
 
 ---
 
@@ -159,7 +159,7 @@ Fuerza un nuevo scrapeo manual inmediato sin esperar al cron.
 
 ## 🛡️ Buenas prácticas y recomendaciones
 - Ejecutar el cron en intervalos razonables para no sobrecargar la web origen.
-- Configurar alertas en caso de errores de conexión a Redis o de envío SMTP.
+- Configurar alertas en caso de errores de conexión a Redis o de envío de correo (SMTP o Resend).
 - Asegurar el despliegue tras HTTPS y restringir IPs si se expone a Internet.
 - Mantener actualizadas las dependencias y revisar los logs rotativos generados por `rotating-file-stream`.
 

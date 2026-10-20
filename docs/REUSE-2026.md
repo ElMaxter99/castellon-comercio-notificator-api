@@ -6,7 +6,7 @@ Guía para volver a poner en marcha el sistema con el programa de bonos 2026. Tr
 - Confirmar la URL del listado de adheridos de la edición 2026 (puede cambiar de dominio o ruta). `BASE_URL` en `src/scraper/index.js` es la única URL fuente.
 - Descargar una página y comprobar la estructura (ver [SCRAPER.md](SCRAPER.md)). Si no es HTML estático paginado (p. ej. SPA o API JSON), conviene sustituir cheerio por llamadas al JSON.
 
-> **Estado (v1.1.0)**: el scraper ya está adaptado y verificado contra la web 2026 (59 comercios, 3 páginas), usa https, y se han implementado la guarda de scrapeo vacío y el scrapeo inicial. Ver [SCRAPER.md](SCRAPER.md).
+> **Estado (v2.0.0)**: el scraper está adaptado y verificado contra la web 2026 (59 comercios, 3 páginas), usa https, y están implementados la guarda de scrapeo vacío, el scrapeo inicial, el hosting gratuito (ver [HOSTING.md](HOSTING.md)) y el correo por SMTP o Resend. Ver [SCRAPER.md](SCRAPER.md).
 
 ## 1. Checklist de puesta en marcha
 1. `cp .env.example .env` y rellenar Redis y correo (SMTP o Resend). **Importante**: usar un `REDIS_NAMESPACE` nuevo (p. ej. `bonos2026`) o vaciar las claves 2025; si no, el primer scrapeo 2026 se compara con el catálogo 2025 y genera bajas/altas masivas y un email enorme.

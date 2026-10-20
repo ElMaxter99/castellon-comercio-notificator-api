@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.2.1 - 2026-10-20
+
+### Seguridad
+- Log de accesos con rotación (`rotating-file-stream`, 10 MB × 5 ficheros) en lugar de `appendFile` sin límite (Snyk CWE-770). El rate limiter ya se aplica antes del logger.
+- La IP del log sale de `req.ip` (respeta `TRUST_PROXY`) y no de la cabecera `X-Forwarded-For` en crudo.
+- `test/queryParser.test.js` usa `fetch` en lugar de `http.get` (aviso CWE-319 sobre un test a `127.0.0.1`).
+- `logs/` añadido a `.gitignore`.
+
 ## v2.2.0 - 2026-10-20
 
 Actualización de dependencias (saltos de versión mayor, verificados uno a uno) y ajuste previo de Express.

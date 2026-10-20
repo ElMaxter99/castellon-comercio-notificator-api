@@ -45,6 +45,10 @@ No hay tests, linter ni build step.
 - Cada release actualiza `CHANGELOG.md` y `version` de `package.json` (flujo gitflow: `develop`, `release/vX.Y.Z`, `master`).
 - No commitear `.env` (ignorado). Plantilla en `.env.example`.
 
+## Imágenes del README
+- `docs/assets/` (banner, logo, `email.png`). **Usa SIEMPRE datos ficticios** en cualquier captura: `tools/readme-screenshots.cjs` renderiza la plantilla del correo con comercios inventados. Nunca publiques datos reales del programa.
+- El README enlaza al repo del front y viceversa; mantén las referencias cruzadas al cambiar nombres o rutas.
+
 ## Trampas conocidas (no las "arregles" sin preguntar)
 1. El scraper usa **selectores CSS acoplados al HTML** de la web oficial; si no devuelve nada, ver `docs/SCRAPER.md`.
 2. `runScrape` **guarda en Redis solo si hay diferencias**, y `saveLastUpdate` se ejecuta aunque no las haya.

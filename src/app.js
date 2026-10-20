@@ -8,10 +8,12 @@ const { verifyMailer } = require("./services/mailService");
 const requestLogger = require("./middleware/logger");
 const rateLimiter = require("./middleware/rateLimiter");
 const logger = require("./utils/logger");
+const { configureQueryParser } = require("./utils/expressSetup");
 
 const app = express();
 
 app.disable("x-powered-by");
+configureQueryParser(app);
 
 // Detrás de un proxy inverso (Render, Nginx...) req.ip sería la IP del proxy y el
 // rate limit contaría a todos los usuarios juntos. TRUST_PROXY=<nº de proxies>.

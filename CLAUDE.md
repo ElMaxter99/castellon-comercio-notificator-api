@@ -40,7 +40,7 @@ node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
 `npm test` ejecuta los tests (`node --test`, carpeta `test/`: geo, auth y salud). El **CI** (`.github/workflows/ci.yml`) corre en cada PR: tests + sintaxis, arranque real con Redis (`/api/status`, `/api/health`, 403 de `force-scrape`) y build de la imagen Docker. No hay linter ni build step.
 
 ## Convenciones
-- CommonJS (`require`), Node ≥ 22 (el Dockerfile usa `node:25.1.0-trixie-slim`).
+- CommonJS (`require`), Node ≥ 22 (el Dockerfile usa `node:26.12.0-trixie-slim`; las dependencias exigen Node ≥ 20).
 - Logs siempre vía `src/utils/logger.js` con `{ context, meta }`; no usar `console.log` directo.
 - Mensajes de log y textos de usuario en español.
 - Los PR deben pasar el CI. Añade tests para la lógica nueva (`test/`).
@@ -56,5 +56,6 @@ node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
 2. `runScrape` **guarda en Redis solo si hay diferencias**, y `saveLastUpdate` se ejecuta aunque no las haya.
 3. Si el scrapeo devuelve 0 comercios se aborta y se conserva el catálogo (`force-scrape` responde 502). Un cambio de edición con el mismo namespace de Redis genera altas/bajas masivas: cambiar `REDIS_NAMESPACE`.
 4. `POST /api/comercios/force-scrape` exige `FORCE_SCRAPE_TOKEN`; sin la variable está **deshabilitada** (403). `/api/health` da 503 si los datos llevan >15 min sin actualizarse.
-5. La web oficial enlaza con `http://`; el scraper fuerza https en todas las URLs que sigue.
-6. `package-lock.json` está en `.gitignore`.
+5. **Express y el filtro**: `/api/comercios/filter` rechaza (400) `?name[]=x` o `?sector[a]=1`; eso exige el parseador de query *extended* (`utils/expressSetup.js`). Express 5 usa *simple* por defecto: no quites esa configuración al actualizar Express (hay un test que lo protege).
+6. La web oficial enlaza con `http://`; el scraper fuerza https en todas las URLs que sigue.
+7. `package-lock.json` está en `.gitignore`.

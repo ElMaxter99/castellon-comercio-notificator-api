@@ -14,7 +14,7 @@
 [![CI](https://github.com/ElMaxter99/castellon-comercio-notificator-api/actions/workflows/ci.yml/badge.svg)](https://github.com/ElMaxter99/castellon-comercio-notificator-api/actions/workflows/ci.yml)
 [![Versión](https://img.shields.io/github/package-json/v/ElMaxter99/castellon-comercio-notificator-api?style=flat-square&color=1E4D2B&label=versi%C3%B3n)](CHANGELOG.md)
 [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A5%2022-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
-[![Express](https://img.shields.io/badge/Express-4-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com)
+[![Express](https://img.shields.io/badge/Express-5-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com)
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&logo=redis&logoColor=white)](https://redis.io)
 [![Docker](https://img.shields.io/badge/Docker-compose-2496ED?style=flat-square&logo=docker&logoColor=white)](docker-compose.yml)
 [![Render](https://img.shields.io/badge/hosting-Render%20%2B%20Upstash-46E3B7?style=flat-square&logo=render&logoColor=white)](docs/HOSTING.md)

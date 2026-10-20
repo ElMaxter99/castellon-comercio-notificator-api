@@ -56,8 +56,11 @@ Orden de middlewares: `x-powered-by` off → `express.json()` → CORS manual (`
 - **logger (HTTP)**: escribe en consola y en `logs/access.log` (se crea en `logs/`). La dependencia `rotating-file-stream` está instalada pero **no se usa** (el README dice "rotativo", en realidad es un append simple).
 
 ## Email
-- `mailService.js`: transporter SMTP creado al cargar el módulo. `MAIL_ENABLED !== "true"` desactiva envío y verificación.
-- `sendDiffEmail`: asunto "🆕 N nuevo(s) comercio(s) adherido(s) – fecha (Europe/Madrid)"; remitente `"Bonos Castelló API" <MAIL_USER>`; destinatario `MAIL_TO`.
+- `mailService.js` elige el proveedor con `MAIL_PROVIDER` (`smtp` por defecto, `resend`; un valor desconocido avisa y usa `smtp`). `MAIL_ENABLED !== "true"` desactiva envío y verificación.
+  - **smtp**: nodemailer (transporter creado en el primer uso). Verifica la conexión al arrancar.
+  - **resend**: `POST https://api.resend.com/emails` con axios (sin SDK; timeout 15 s, `Authorization: Bearer RESEND_API_KEY`). Al arrancar solo valida la configuración (no hay "ping" para claves de solo envío). Los errores se registran con estado HTTP y detalle, **sin cabeceras** (no se filtra la API key). Es la opción para hosts que bloquean el SMTP saliente (Render gratis).
+- `sendDiffEmail`: asunto "🆕 N nuevo(s) comercio(s) adherido(s) – fecha (Europe/Madrid)"; remitente `MAIL_FROM` (smtp: `"Bonos Castelló API" <MAIL_USER>` si no se define; resend: `onboarding@resend.dev` si no se define, que solo entrega al correo de tu cuenta de Resend); `MAIL_TO` admite varias direcciones separadas por comas. Un fallo de envío se loguea y no interrumpe el cron.
+- Para añadir otro proveedor: objeto con `verify()` y `send({ to, subject, html })` en el mapa `providers`.
 - `templateService.js`: agrupa altas por sector, escapa todo con `escapeHtml`, sustituye `{{date}}`, `{{totalChanges}}`, `{{addedSection}}`, `{{removedSection}}`, `{{noChangesMessage}}`, `{{frontendUrl}}` en `src/templates/updateEmail.html`. Para añadir otra plantilla: nueva entrada en `src/enums/mailTemplates.js` + `case` en `getTemplateHtml`.
 
 ## Dependencias clave

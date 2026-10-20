@@ -21,19 +21,15 @@ services:
       - key: REDIS_NAMESPACE
         value: bonos2026 # cambia por edición para no mezclar datos
       - key: MAIL_ENABLED
-        value: "false" # pon "true" cuando el SMTP esté configurado
-      - key: MAIL_HOST
-        value: smtp.gmail.com
-      - key: MAIL_PORT
-        value: "465"
-      - key: MAIL_SECURE
-        value: "true"
-      - key: MAIL_USER
-        sync: false
-      - key: MAIL_PASS
-        sync: false # contraseña de aplicación de Google
+        value: "false" # pon "true" cuando Resend esté configurado
+      - key: MAIL_PROVIDER
+        value: resend # Render gratis bloquea el SMTP saliente (25/465/587): se usa la API HTTPS de Resend
+      - key: RESEND_API_KEY
+        sync: false # re_... (Resend → API Keys)
+      - key: MAIL_FROM
+        sync: false # "Bonos Castelló <avisos@tudominio.es>" (dominio verificado en Resend)
       - key: MAIL_TO
-        sync: false
+        sync: false # uno o varios separados por comas
       - key: FRONTEND_URL
         sync: false # URL pública del front (se usa en el email)
       - key: RATE_LIMIT_MAX_REQUESTS

@@ -10,7 +10,7 @@ El API necesita (1) un proceso Node vivo, porque el cron de 5 min corre **dentro
 | Proceso Node | [Render](https://render.com) Web Service (Docker) | Se duerme tras 15 min sin tráfico → necesita pinger |
 | Redis | [Upstash](https://upstash.com) | Persistente; solo base 0 y TLS (`rediss://`) |
 | Mantener despierto | UptimeRobot o cron-job.org | `GET /api/status` cada 5 min (a la vez da alertas) |
-| Email | Gmail + contraseña de aplicación | O dejar `MAIL_ENABLED=false` |
+| Email | [Resend](https://resend.com) (API HTTPS) | **Render gratis bloquea el SMTP** (puertos 25/465/587), así que Gmail/SMTP no funciona ahí. O dejar `MAIL_ENABLED=false` |
 
 ## Pasos
 ### 1. Redis en Upstash
@@ -22,7 +22,7 @@ El API necesita (1) un proceso Node vivo, porque el cron de 5 min corre **dentro
    - **Rama**: elige una que contenga el scraper 2026 (v1.1.0 o posterior). Siguiendo gitflow, eso significa `develop` hasta que hagas la release a `master`; si despliegas `master` antes, ejecutará el scraper antiguo (v1.0.2), que no trata bien la web 2026. El `render.yaml` no fija la rama a propósito.
 2. Rellena las variables marcadas `sync: false`:
    - `REDIS_URL` → la URL de Upstash.
-   - `MAIL_USER`, `MAIL_PASS`, `MAIL_TO`, `FRONTEND_URL` (o déjalas vacías si dejas el correo desactivado).
+   - `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO`, `FRONTEND_URL` (o déjalas vacías si dejas el correo desactivado; ver paso 5).
 3. Despliega. En los logs deberías ver `Redis conectado correctamente`, `Catálogo vacío: scrapeo inicial` y `Scrapeo completado`.
 4. Comprueba: `https://TU-SERVICIO.onrender.com/api/status` y `/api/comercios/status`.
 
@@ -38,7 +38,15 @@ Render duerme el servicio tras 15 min sin tráfico y, al dormir, el cron deja de
 En el repo del front cambia `apiBaseUrl` en `src/environments/environment.prod.ts` y `environment.test.ts` (y los `mock.*` si se usan) por `https://TU-SERVICIO.onrender.com`, y vuelve a desplegar.
 
 ### 5. Emails (opcional)
-En la cuenta de Google activa la verificación en dos pasos y crea una **contraseña de aplicación**. En Render: `MAIL_ENABLED=true`, `MAIL_USER` (tu Gmail), `MAIL_PASS` (la contraseña de aplicación), `MAIL_TO` (destinatario). El arranque loguea `SMTP verificado correctamente` si va bien.
+Render **bloquea el SMTP saliente** en los servicios gratuitos ([changelog de Render](https://render.com/changelog/free-web-services-will-no-longer-allow-outbound-traffic-to-smtp-ports)), así que allí hay que usar Resend, que envía por HTTPS:
+1. Crea cuenta en [Resend](https://resend.com) y una **API key** (*API Keys → Create*, permiso de envío).
+2. Remitente:
+   - **Pruebas**: sin dominio, el remitente por defecto es `onboarding@resend.dev` y solo entrega al correo con el que te registraste en Resend. Pon `MAIL_TO` con ese correo.
+   - **Producción**: añade y verifica un dominio tuyo en Resend (registros DNS) y pon `MAIL_FROM="Bonos Castelló <avisos@tudominio.es>"`. Podrás enviar a cualquier destinatario.
+3. En Render: `MAIL_PROVIDER=resend` (ya viene así en `render.yaml`), `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO` (varios separados por comas) y `MAIL_ENABLED=true`.
+4. El arranque loguea `Proveedor de correo: resend` y `Resend configurado`; al detectar comercios nuevos, `Correo enviado`.
+
+En un servidor propio sin bloqueo de puertos (VM de Oracle, Docker en casa) puedes seguir usando SMTP (`MAIL_PROVIDER=smtp`, p. ej. Gmail con contraseña de aplicación).
 
 ## Consumo estimado de Redis
 El cron hace ~2 comandos por ejecución (8.640 ejecuciones/mes ≈ 17 K) + 1 `PING` por cada `/api/status` del pinger (≈ 9 K/mes) + las consultas del front (2-3 por visita). Muy por debajo del cupo mensual gratuito indicado por Upstash en el momento de escribir esto (500 K comandos/mes).
@@ -59,4 +67,6 @@ Una VM ARM siempre encendida permite usar `docker-compose.yml` tal cual (Redis i
 | `Too many requests` con poco tráfico | Falta `TRUST_PROXY=1` |
 | El cron "se para" | El pinger no está activo y Render durmió el servicio |
 | 0 comercios | Mira logs `SCRAPER`/`CRON`; lanza `POST /api/comercios/force-scrape` |
+| Email no llega / `Resend rechazó el envío` 403 | `MAIL_FROM` de un dominio sin verificar, o destinatario distinto al de tu cuenta usando `onboarding@resend.dev` |
+| SMTP: timeout / `ETIMEDOUT` en Render | Render gratis bloquea 25/465/587: usa `MAIL_PROVIDER=resend` |
 | Email enorme tras cambiar de edición | Reutilizaste el namespace de Redis: usa uno nuevo |

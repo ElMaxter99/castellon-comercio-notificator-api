@@ -40,7 +40,7 @@ node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
 `npm test` ejecuta los tests (`node --test`, carpeta `test/`: geo, auth y salud). El **CI** (`.github/workflows/ci.yml`) corre en cada PR: tests + sintaxis, arranque real con Redis (`/api/status`, `/api/health`, 403 de `force-scrape`) y build de la imagen Docker. No hay linter ni build step.
 
 ## Convenciones
-- CommonJS (`require`), Node ≥ 22 (el Dockerfile usa `node:25.1.0-trixie-slim`).
+- CommonJS (`require`), Node ≥ 22 (el Dockerfile usa `node:26.12.0-trixie-slim`; las dependencias exigen Node ≥ 20).
 - Logs siempre vía `src/utils/logger.js` con `{ context, meta }`; no usar `console.log` directo.
 - Mensajes de log y textos de usuario en español.
 - Los PR deben pasar el CI. Añade tests para la lógica nueva (`test/`).

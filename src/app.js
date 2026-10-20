@@ -10,6 +10,13 @@ const logger = require("./utils/logger");
 const app = express();
 
 app.disable("x-powered-by");
+
+// Detrás de un proxy inverso (Render, Nginx...) req.ip sería la IP del proxy y el
+// rate limit contaría a todos los usuarios juntos. TRUST_PROXY=<nº de proxies>.
+const trustProxyHops = Number.parseInt(process.env.TRUST_PROXY || "", 10);
+if (Number.isInteger(trustProxyHops) && trustProxyHops > 0) {
+  app.set("trust proxy", trustProxyHops);
+}
 app.use(express.json());
 
 app.use((req, res, next) => {

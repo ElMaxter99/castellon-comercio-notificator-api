@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.1 - 2026-10-20
+### Agregado
+- `render.yaml` (Blueprint de Render) y `docs/HOSTING.md` con la guía de hosting gratuito (Render + Upstash + pinger).
+- Variable `TRUST_PROXY` para que el rate limit use la IP real del cliente detrás de un proxy inverso.
+
 ## v1.1.0 - 2026-10-20
 ### Agregado
 - Scrapeo inicial automático cuando Redis no tiene comercios (sin enviar correo en esa carga inicial).

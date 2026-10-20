@@ -44,4 +44,4 @@ Redis accesible (`REDIS_HOST=localhost`), `npm install`, `npm start`. Atención:
 - Reiniciar de cero una edición: borrar claves `*:bonos:comercios|history|sectors|last-update` (ver `REUSE-2026.md`).
 
 ## Seguridad aplicada (v1.0.2)
-Cabecera `X-Powered-By` desactivada, rate limit, validación de tipos en `/filter`, HTML de emails escapado, nodemailer 7, imagen base `-slim`.
+Cabecera `X-Powered-By` desactivada, rate limit, validación de tipos en `/filter`, HTML de emails escapado, nodemailer 10, imagen base `-slim`.

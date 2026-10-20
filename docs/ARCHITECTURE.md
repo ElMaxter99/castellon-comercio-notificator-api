@@ -69,7 +69,7 @@ Orden de middlewares: `x-powered-by` off → `express.json()` → CORS manual (`
 - `templateService.js`: agrupa altas por sector, escapa todo con `escapeHtml`, sustituye `{{date}}`, `{{totalChanges}}`, `{{addedSection}}`, `{{removedSection}}`, `{{noChangesMessage}}`, `{{frontendUrl}}` en `src/templates/updateEmail.html`. Para añadir otra plantilla: nueva entrada en `src/enums/mailTemplates.js` + `case` en `getTemplateHtml`.
 
 ## Dependencias clave
-express 4, axios, cheerio 1.0.0-rc, ioredis, node-cron, nodemailer 7, rotating-file-stream (sin uso).
+express 5, axios, cheerio 1.0.0-rc, ioredis 6, node-cron 4, nodemailer 10, rotating-file-stream (sin uso).
 
 ## Despliegue de referencia (2025)
 API en Docker (compose: `app` + `redis:7-alpine` con password y volumen), publicada como `https://bcc-api.alvaromaxter.es`. Front en Vercel.

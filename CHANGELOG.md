@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.2.0 - 2026-10-20
+
+Actualización de dependencias (saltos de versión mayor, verificados uno a uno) y ajuste previo de Express.
+
+### Cambio
+- **Express 4 → 5.3**, **ioredis 5 → 6**, **node-cron 3 → 4.6**, **nodemailer 7 → 10.1**: probados contra `master` (endpoints, cron con expresión real, correo SMTP con autenticación, Redis con contraseña, selección de DB, reconexión y TLS `rediss://`) sin diferencias de comportamiento. Requieren Node ≥ 20.
+- Imagen base `node:26.12.0-trixie-slim` (probado el API completo con Node 26.12).
+- GitHub Actions: `actions/checkout` y `actions/setup-node` a la v7.
+
+### Corrección
+- El parseador de query de Express se fija explícitamente a *extended* (`utils/expressSetup.js`): Express 5 usa *simple* por defecto y el filtro `/api/comercios/filter` dejaría de rechazar `?name[]=x` y `?sector[a]=1`. Incluye un test que lo protege (verificado: falla con Express 5 sin el ajuste).
+
 ## v2.1.1 - 2026-10-20
 
 ### Agregado

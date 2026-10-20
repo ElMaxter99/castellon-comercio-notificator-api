@@ -56,5 +56,6 @@ node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
 2. `runScrape` **guarda en Redis solo si hay diferencias**, y `saveLastUpdate` se ejecuta aunque no las haya.
 3. Si el scrapeo devuelve 0 comercios se aborta y se conserva el catálogo (`force-scrape` responde 502). Un cambio de edición con el mismo namespace de Redis genera altas/bajas masivas: cambiar `REDIS_NAMESPACE`.
 4. `POST /api/comercios/force-scrape` exige `FORCE_SCRAPE_TOKEN`; sin la variable está **deshabilitada** (403). `/api/health` da 503 si los datos llevan >15 min sin actualizarse.
-5. La web oficial enlaza con `http://`; el scraper fuerza https en todas las URLs que sigue.
-6. `package-lock.json` está en `.gitignore`.
+5. **Express y el filtro**: `/api/comercios/filter` rechaza (400) `?name[]=x` o `?sector[a]=1`; eso exige el parseador de query *extended* (`utils/expressSetup.js`). Express 5 usa *simple* por defecto: no quites esa configuración al actualizar Express (hay un test que lo protege).
+6. La web oficial enlaza con `http://`; el scraper fuerza https en todas las URLs que sigue.
+7. `package-lock.json` está en `.gitignore`.

@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.1.2 - 2026-10-20
+
+### Corrección
+- El parseador de query de Express se fija explícitamente a *extended* (`utils/expressSetup.js`). Con Express 4 ya era el comportamiento por defecto, así que no cambia nada hoy; evita que al actualizar a Express 5 (que usa *simple*) el filtro `/api/comercios/filter` deje de rechazar `?name[]=x` y `?sector[a]=1`. Incluye un test que protege la condición.
+
 ## v2.1.1 - 2026-10-20
 
 ### Agregado

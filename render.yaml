@@ -1,0 +1,36 @@
+# Blueprint de Render: https://render.com/docs/blueprint-spec
+# Despliegue gratuito del API. Redis va aparte (Upstash, plan gratuito): ver docs/HOSTING.md
+services:
+  - type: web
+    name: castellon-comercio-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    # Sin `branch`: Render usa la rama que elijas al importar el Blueprint (por defecto la del repo).
+    # Ojo: debe contener el scraper 2026 (v1.1.0+); `master` hasta publicar una release sigue en v1.0.2.
+    autoDeploy: true
+    healthCheckPath: /api/status
+    envVars:
+      # PORT lo inyecta Render; el API lo lee de process.env.PORT
+      - key: NODE_ENV
+        value: prod # db 0 de Redis (Upstash solo ofrece la 0)
+      - key: TRUST_PROXY
+        value: "1" # Render pone un proxy delante: necesario para el rate limit
+      - key: REDIS_URL
+        sync: false # rediss://default:PASSWORD@HOST:6379 (Upstash)
+      - key: REDIS_NAMESPACE
+        value: bonos2026 # cambia por edición para no mezclar datos
+      - key: MAIL_ENABLED
+        value: "false" # pon "true" cuando Resend esté configurado
+      - key: MAIL_PROVIDER
+        value: resend # Render gratis bloquea el SMTP saliente (25/465/587): se usa la API HTTPS de Resend
+      - key: RESEND_API_KEY
+        sync: false # re_... (Resend → API Keys)
+      - key: MAIL_FROM
+        sync: false # "Bonos Castelló <avisos@tudominio.es>" (dominio verificado en Resend)
+      - key: MAIL_TO
+        sync: false # uno o varios separados por comas
+      - key: FRONTEND_URL
+        sync: false # URL pública del front (se usa en el email)
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: "120"

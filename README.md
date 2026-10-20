@@ -7,6 +7,12 @@ El servicio se encarga de monitorizar periódicamente la web oficial de bonos mu
 
 ---
 
+## 📚 Documentación para desarrolladores (y para Claude)
+- [`CLAUDE.md`](CLAUDE.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/API.md`](docs/API.md) · [`docs/SCRAPER.md`](docs/SCRAPER.md) · [`docs/OPERATIONS.md`](docs/OPERATIONS.md) · [`docs/HOSTING.md`](docs/HOSTING.md) · [`docs/REUSE-2026.md`](docs/REUSE-2026.md)
+- Frontend: [castellon-comercio-notificator-front](https://github.com/ElMaxter99/castellon-comercio-notificator-front)
+
+---
+
 ## 🚀 Características principales
 - 🔁 Scrapeo automático y programable mediante `cron`.
 - 💾 Almacenamiento en **Redis** con separación por entorno (`dev`, `staging`, `prod`).
@@ -22,7 +28,7 @@ El servicio se encarga de monitorizar periódicamente la web oficial de bonos mu
 | **Express API** | Expone endpoints REST `/api/comercios/**` para consumo externo. |
 | **Scraper (cron)** | Tarea programada que visita la web oficial, parsea con `cheerio` y normaliza los datos. |
 | **Redis** | Cachea la información actual y guarda snapshots históricos. |
-| **Mailer** | Notifica por SMTP cuando se detectan diferencias entre ejecuciones consecutivas. |
+| **Mailer** | Notifica por correo (SMTP o Resend, según `MAIL_PROVIDER`) cuando aparecen comercios nuevos. |
 
 ---
 
@@ -40,7 +46,8 @@ REDIS_PORT=6379
 REDIS_NAMESPACE=bonos
 REDIS_PASSWORD=supersecurepass
 
-# Correo (SMTP)
+# Correo: MAIL_PROVIDER=smtp (por defecto) o resend
+MAIL_PROVIDER=smtp
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=465
 MAIL_SECURE=true
@@ -48,6 +55,10 @@ MAIL_USER=tuemail@gmail.com
 MAIL_PASS=app_password_generado
 MAIL_TO=destinatario@gmail.com
 MAIL_ENABLED=true
+
+# Solo con MAIL_PROVIDER=resend (API HTTPS)
+# RESEND_API_KEY=re_xxxxxxxxxxxx
+# MAIL_FROM=Bonos Castelló <avisos@tudominio.es>
 
 # URL del frontend (opcional)
 FRONTEND_URL=http://localhost:4200
@@ -148,7 +159,7 @@ Fuerza un nuevo scrapeo manual inmediato sin esperar al cron.
 
 ## 🛡️ Buenas prácticas y recomendaciones
 - Ejecutar el cron en intervalos razonables para no sobrecargar la web origen.
-- Configurar alertas en caso de errores de conexión a Redis o de envío SMTP.
+- Configurar alertas en caso de errores de conexión a Redis o de envío de correo (SMTP o Resend).
 - Asegurar el despliegue tras HTTPS y restringir IPs si se expone a Internet.
 - Mantener actualizadas las dependencias y revisar los logs rotativos generados por `rotating-file-stream`.
 

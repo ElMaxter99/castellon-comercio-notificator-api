@@ -1,5 +1,40 @@
 # Changelog
 
+## v2.0.0 - 2026-10-20
+
+Versión mayor por el cambio de edición: el API pasa a la web 2026 del programa (alineada con el front 2.0.0).
+
+### Cambio
+- El scraper apunta a la web de la edición 2026 y normaliza datos de forma distinta a 1.0.x (direcciones sin el sufijo de municipio/país, URLs en https). **Al actualizar desde 1.0.x usa un `REDIS_NAMESPACE` nuevo** (p. ej. `bonos2026`) o vacía las claves: si no, el primer scrapeo se compara con el catálogo 2025 y genera altas/bajas masivas.
+- Despliegue gratuito documentado y preparado (`render.yaml`, `docs/HOSTING.md`: Render + Upstash + pinger) y correo configurable (SMTP o Resend). Resumen de lo incorporado desde 1.0.2: scraper 2026 (1.1.0), `TRUST_PROXY`, Blueprint de Render (1.1.1) y Resend (1.2.0).
+
+### Corrección
+- Documentación al día: ejemplo de imagen en `https`, menciones a Resend, estado de la guía de reutilización y rama de despliegue.
+
+## v1.2.0 - 2026-10-20
+### Agregado
+- Envío de correo con **Resend** (API HTTPS) como alternativa al SMTP tradicional: `MAIL_PROVIDER=smtp|resend`, `RESEND_API_KEY` y `MAIL_FROM`. Necesario en Render gratis, que bloquea el SMTP saliente.
+- `MAIL_TO` admite varios destinatarios separados por comas; `MAIL_FROM` opcional también en SMTP.
+
+### Cambio
+- `render.yaml` y `docs/HOSTING.md` usan Resend; la guía anterior recomendaba Gmail por SMTP, que no funciona en Render gratis.
+
+## v1.1.1 - 2026-10-20
+### Agregado
+- `render.yaml` (Blueprint de Render) y `docs/HOSTING.md` con la guía de hosting gratuito (Render + Upstash + pinger).
+- Variable `TRUST_PROXY` para que el rate limit use la IP real del cliente detrás de un proxy inverso.
+
+## v1.1.0 - 2026-10-20
+### Agregado
+- Scrapeo inicial automático cuando Redis no tiene comercios (sin enviar correo en esa carga inicial).
+- Timeout de 20 s y 2 reintentos al descargar cada página; guardas ante bucles de paginación.
+
+### Cambio
+- Scraper adaptado a la web 2026: https, URLs de paginación e imágenes normalizadas y direcciones sin el sufijo "CASTELLÓ DE LA PLANA / …, ESPAÑA".
+
+### Corrección
+- Un scrapeo que devuelve 0 comercios ya no vacía el catálogo ni registra bajas masivas.
+
 ## v1.0.2 - 2025-11-05
 ### Agregado
 - Add in-memory rate limiter before request logging #10

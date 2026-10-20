@@ -7,7 +7,9 @@
 # Castellón Comercio · API
 
 **Vigila la web oficial del programa de bonos, guarda el histórico y avisa cuando aparecen comercios nuevos.**
-<br>Backend de la web [Castellón Comercio](https://github.com/ElMaxter99/castellon-comercio-notificator-front).
+<br>Backend de la web [Castellón Comercio](https://bono-castellon.alvaromaxter.es/) · [código del front](https://github.com/ElMaxter99/castellon-comercio-notificator-front).
+
+[![Web pública](https://img.shields.io/badge/%F0%9F%8C%90%20web%20p%C3%BAblica-bono--castellon.alvaromaxter.es-1E4D2B?style=for-the-badge)](https://bono-castellon.alvaromaxter.es/)
 
 [![Versión](https://img.shields.io/github/package-json/v/ElMaxter99/castellon-comercio-notificator-api?style=flat-square&color=1E4D2B&label=versi%C3%B3n)](CHANGELOG.md)
 [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A5%2022-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
@@ -17,7 +19,7 @@
 [![Render](https://img.shields.io/badge/hosting-Render%20%2B%20Upstash-46E3B7?style=flat-square&logo=render&logoColor=white)](docs/HOSTING.md)
 [![Resend](https://img.shields.io/badge/email-SMTP%20%C2%B7%20Resend-F77F00?style=flat-square)](docs/OPERATIONS.md)
 
-[Ecosistema](#-ecosistema) · [Cómo funciona](#-cómo-funciona) · [Arranque rápido](#-arranque-rápido) · [Endpoints](#-endpoints) · [Documentación](#-documentación) · [🖥️ Front](https://github.com/ElMaxter99/castellon-comercio-notificator-front)
+[🌐 Web pública](https://bono-castellon.alvaromaxter.es/) · [Ecosistema](#-ecosistema) · [Cómo funciona](#-cómo-funciona) · [Arranque rápido](#-arranque-rápido) · [Endpoints](#-endpoints) · [Documentación](#-documentación) · [🖥️ Front](https://github.com/ElMaxter99/castellon-comercio-notificator-front)
 
 </div>
 
@@ -46,6 +48,7 @@ flowchart LR
 |---|---|---|
 | ⚙️ **API** (este) | Scraper, Redis, histórico, avisos por correo y REST | [`docs/`](docs) · [`CLAUDE.md`](CLAUDE.md) |
 | 🖥️ [**Front**](https://github.com/ElMaxter99/castellon-comercio-notificator-front) | Web con las ediciones 2025 (demo) y 2026 | [`docs/`](https://github.com/ElMaxter99/castellon-comercio-notificator-front/tree/develop/docs) |
+| 🌐 **Web pública** | La web en producción que consume este API ([alternativa en Vercel](https://castellon-comercio-notificator-fron.vercel.app/)) | [bono-castellon.alvaromaxter.es](https://bono-castellon.alvaromaxter.es/) |
 
 ## ✨ Qué hace
 

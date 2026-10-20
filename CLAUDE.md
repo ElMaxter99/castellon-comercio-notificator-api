@@ -18,6 +18,7 @@ Proyecto independiente y sin ánimo de lucro; no tiene relación oficial con el 
 | `src/services/mailService.js` | Email con proveedor `smtp` (nodemailer) o `resend` (API HTTPS), `sendDiffEmail` (solo altas) |
 | `src/services/templateService.js` + `src/templates/updateEmail.html` | Render del email (escapa HTML) |
 | `src/utils/diff.js` | Diff por **nombre** (altas/bajas) |
+| `src/utils/geo.js` · `src/utils/health.js` · `src/middleware/adminAuth.js` | Saneado de coordenadas, evaluación de salud y token de administración |
 | `src/middleware/rateLimiter.js` | Límite en memoria por IP |
 | `scripts/*.sh`, `scripts/syncSectors.js` | Operación Docker y reparación de sectores |
 
@@ -36,7 +37,7 @@ npm start                 # node src/app.js (necesita Redis accesible)
 docker compose up --build # API + Redis
 node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
 ```
-No hay tests, linter ni build step.
+`npm test` ejecuta los tests (`node --test`, carpeta `test/`: geo, auth y salud). No hay linter ni build step.
 
 ## Convenciones
 - CommonJS (`require`), Node ≥ 22 (el Dockerfile usa `node:25.1.0-trixie-slim`).
@@ -52,7 +53,7 @@ No hay tests, linter ni build step.
 ## Trampas conocidas (no las "arregles" sin preguntar)
 1. El scraper usa **selectores CSS acoplados al HTML** de la web oficial; si no devuelve nada, ver `docs/SCRAPER.md`.
 2. `runScrape` **guarda en Redis solo si hay diferencias**, y `saveLastUpdate` se ejecuta aunque no las haya.
-3. Si el scrapeo devuelve 0 comercios se aborta y se conserva el catálogo (pero `force-scrape` igualmente responde `ok: true`). Un cambio de edición con el mismo namespace de Redis genera altas/bajas masivas: cambiar `REDIS_NAMESPACE`.
-4. `POST /api/comercios/force-scrape` **no tiene autenticación**.
+3. Si el scrapeo devuelve 0 comercios se aborta y se conserva el catálogo (`force-scrape` responde 502). Un cambio de edición con el mismo namespace de Redis genera altas/bajas masivas: cambiar `REDIS_NAMESPACE`.
+4. `POST /api/comercios/force-scrape` exige `FORCE_SCRAPE_TOKEN`; sin la variable está **deshabilitada** (403). `/api/health` da 503 si los datos llevan >15 min sin actualizarse.
 5. La web oficial enlaza con `http://`; el scraper fuerza https en todas las URLs que sigue.
 6. `package-lock.json` está en `.gitignore`.

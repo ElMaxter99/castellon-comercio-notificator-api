@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.1.0 - 2026-10-20
+
+### Agregado
+- `GET /api/health`: salud para monitores externos; responde 503 si Redis falla o si los datos llevan más de `HEALTH_MAX_AGE_MINUTES` (15) sin actualizarse. Periodo de gracia de 6 min tras arrancar.
+- Saneado de coordenadas (`utils/geo.js`): los comercios con coordenadas fuera de la zona (30 km alrededor de Castelló, configurable con `GEO_*`) pasan a usar una búsqueda por dirección en `mapsUrl`, y los de otra provincia se excluyen (p. ej. una entrada del proveedor de la web, en León).
+- Tests con el runner integrado de Node (`npm test`): geo, autenticación y salud.
+- Workflow de GitHub Actions opcional (`.github/workflows/uptime.yml`) que comprueba `/api/health`.
+
+### Cambio
+- **`POST /api/comercios/force-scrape` requiere `Authorization: Bearer $FORCE_SCRAPE_TOKEN`**; sin la variable la ruta queda deshabilitada (403) en vez de abierta. Quien la use debe definir el token.
+- `force-scrape` responde 502 con el error cuando el scrapeo falla (antes respondía siempre `ok: true`) y devuelve un resumen (`changed`, `total`, `added`, `removed`).
+
 ## v2.0.0 - 2026-10-20
 
 Versión mayor por el cambio de edición: el API pasa a la web 2026 del programa (alineada con el front 2.0.0).

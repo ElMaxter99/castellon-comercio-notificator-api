@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.1.1 - 2026-10-20
+
+### Agregado
+- **CI** con GitHub Actions (`.github/workflows/ci.yml`): en cada PR y push a `develop`/`master` ejecuta los tests y la comprobación de sintaxis, un *smoke test* (arranca el API contra un Redis real y comprueba `/api/status`, `/api/health` y que `force-scrape` está deshabilitado sin token) y el build de la imagen Docker.
+- Dependabot: npm (semanal), imagen Docker y GitHub Actions (mensual), contra `develop`.
+
 ## v2.1.0 - 2026-10-20
 
 ### Agregado

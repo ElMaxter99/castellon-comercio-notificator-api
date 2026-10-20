@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.0 - 2026-10-20
+### Agregado
+- Scrapeo inicial automático cuando Redis no tiene comercios (sin enviar correo en esa carga inicial).
+- Timeout de 20 s y 2 reintentos al descargar cada página; guardas ante bucles de paginación.
+
+### Cambio
+- Scraper adaptado a la web 2026: https, URLs de paginación e imágenes normalizadas y direcciones sin el sufijo "CASTELLÓ DE LA PLANA / …, ESPAÑA".
+
+### Corrección
+- Un scrapeo que devuelve 0 comercios ya no vacía el catálogo ni registra bajas masivas.
+
 ## v1.0.2 - 2025-11-05
 ### Agregado
 - Add in-memory rate limiter before request logging #10

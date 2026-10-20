@@ -1,19 +1,11 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const http = require("node:http");
 const express = require("express");
 const { configureQueryParser } = require("../src/utils/expressSetup");
 
-function getJson(port, path) {
-  return new Promise((resolve, reject) => {
-    http
-      .get({ port, path }, (res) => {
-        let body = "";
-        res.on("data", (chunk) => (body += chunk));
-        res.on("end", () => resolve(JSON.parse(body)));
-      })
-      .on("error", reject);
-  });
+async function getJson(port, path) {
+  const res = await fetch(`http://127.0.0.1:${port}${path}`);
+  return res.json();
 }
 
 test("el parseador de query 'extended' mantiene name[] / sector[a] como array / objeto (validación del filtro)", async () => {

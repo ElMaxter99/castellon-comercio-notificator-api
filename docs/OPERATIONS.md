@@ -5,6 +5,7 @@
 |---|---|---|
 | `NODE_ENV` | `dev` | `prod`→Redis DB 0, `staging`→1, otro→2; prefijo de claves |
 | `PORT` | `12001` | Puerto HTTP |
+| `TRUST_PROXY` | — | Nº de proxies inversos delante (Render = 1). Necesario para que el rate limit distinga IPs |
 | `RATE_LIMIT_WINDOW_MS` | `60000` | Ventana del rate limit |
 | `RATE_LIMIT_MAX_REQUESTS` | `120` | Máx. peticiones por IP y ventana |
 | `REDIS_URL` | — | Si existe, ignora host/port/password |

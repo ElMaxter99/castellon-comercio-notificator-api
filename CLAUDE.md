@@ -47,7 +47,7 @@ No hay tests, linter ni build step.
 ## Trampas conocidas (no las "arregles" sin preguntar)
 1. El scraper usa **selectores CSS acoplados al HTML** de la web oficial; si no devuelve nada, ver `docs/SCRAPER.md`.
 2. `runScrape` **guarda en Redis solo si hay diferencias**, y `saveLastUpdate` se ejecuta aunque no las haya.
-3. Si el scrapeo devuelve 0 comercios (web caída/cambiada), el diff marcará **todos como "removed"** y se vaciará el catálogo. Hay una mejora propuesta en `docs/REUSE-2026.md`.
+3. Si el scrapeo devuelve 0 comercios se aborta y se conserva el catálogo (pero `force-scrape` igualmente responde `ok: true`). Un cambio de edición con el mismo namespace de Redis genera altas/bajas masivas: cambiar `REDIS_NAMESPACE`.
 4. `POST /api/comercios/force-scrape` **no tiene autenticación**.
-5. `BASE_URL` del scraper es `http://` (no https).
+5. La web oficial enlaza con `http://`; el scraper fuerza https en todas las URLs que sigue.
 6. `package-lock.json` está en `.gitignore`.

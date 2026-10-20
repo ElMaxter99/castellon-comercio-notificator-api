@@ -20,6 +20,17 @@ async function runScrape(manual = false) {
   try {
     const nuevos = await scrapeComercios();
     const antiguos = await getComercios();
+
+    // Protección: una web caída o cambiada devuelve 0 comercios; no se debe
+    // vaciar el catálogo ni registrar "bajas" masivas.
+    if (nuevos.length === 0) {
+      logger.error("El scrapeo no devolvió comercios; se conserva el catálogo anterior", {
+        context: "CRON",
+        meta: { previos: antiguos.length },
+      });
+      return;
+    }
+
     const diff = diffComercios(antiguos, nuevos);
 
     if (diff.added.length || diff.removed.length) {
@@ -41,7 +52,12 @@ async function runScrape(manual = false) {
 
       await updateSectorsFromComercios(nuevos);
 
-      if (diff.added.length > 0) {
+      if (antiguos.length === 0) {
+        logger.info("Carga inicial del catálogo: no se envía correo", {
+          context: "CRON",
+          meta: { total: nuevos.length },
+        });
+      } else if (diff.added.length > 0) {
         logger.info("Nuevos comercios detectados, enviando correo", {
           context: "CRON",
           meta: { added: diff.added.length },
@@ -65,9 +81,16 @@ async function runScrape(manual = false) {
   }
 }
 
-function startCron() {
+async function startCron() {
   logger.info("Cron programado cada 5 minutos", { context: "CRON" });
   cron.schedule("*/5 * * * *", () => runScrape(false));
+
+  // Con Redis vacío (primer arranque o namespace nuevo) no se espera al primer tick.
+  const actuales = await getComercios();
+  if (actuales.length === 0) {
+    logger.info("Catálogo vacío: scrapeo inicial", { context: "CRON" });
+    await runScrape(false);
+  }
 }
 
 module.exports = { runScrape, startCron };

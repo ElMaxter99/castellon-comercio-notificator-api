@@ -3,8 +3,8 @@
 Es la pieza más frágil: depende del HTML de la web oficial. Si el Ayuntamiento/organizador cambia la web (algo probable entre ediciones), hay que rehacer los selectores.
 
 ## Qué hace
-1. Parte de `BASE_URL = http://bonoscastellodelaplana.es/establecimientos-adheridos-al-programa`.
-2. `scrapePage(url)`: GET con `User-Agent: Mozilla/5.0`, carga el HTML en cheerio.
+1. Parte de `BASE_URL = https://bonoscastellodelaplana.es/establecimientos-adheridos-al-programa` (la web 2026 sirve https; sus enlaces internos siguen siendo `http://`, por eso se fuerzan a https).
+2. `scrapePage(url)`: GET con `User-Agent: Mozilla/5.0`, timeout 20 s y 2 reintentos, carga el HTML en cheerio.
 3. Cada comercio es un `.col-sm-12.col-md-6.col-xxl-4` que contiene una tabla:
 
 | Campo | Selector dentro de la tarjeta |
@@ -12,15 +12,15 @@ Es la pieza más frágil: depende del HTML de la web oficial. Si el Ayuntamiento
 | `name` | primer `td strong` |
 | `sector` | `tr:nth-child(2) td:nth-child(2)` |
 | `phone` | `tr:nth-child(3) td:nth-child(2)` |
-| `address` | `tr:nth-child(4) td:nth-child(2)` |
-| `img` | `img[src]`, reemplazando `../../` por `http://bonoscastellodelaplana.es/` |
-| `mapsUrl` | `href` del primer `a` |
+| `address` | `tr:nth-child(4) td:nth-child(2)`, quitando el sufijo `CASTELLÓ DE LA PLANA / CASTELLÓN DE LA PLANA, COMUNITAT VALENCIANA, CP, ESPAÑA` (`cleanAddress`) |
+| `img` | `img[src]` resuelto contra la web (`../../imagenes/...` → `https://bonoscastellodelaplana.es/imagenes/...`) |
+| `mapsUrl` | `href` del `a.card`: `https://www.google.com/maps/search/?api=1&query=lat,lng` |
 
    Todos los textos pasan por `cleanText` (colapsa espacios). Solo se añade si `name` no está vacío.
-4. Paginación: busca `a.page-link` cuyo texto incluya "Siguiente"; si `href` no es `#`, lo sigue (absoluto, o `BASE_URL/<href sin / inicial>`). Bucle hasta que no haya siguiente.
+4. Paginación: busca `a.page-link` cuyo texto incluya "Siguiente"; si `href` no es `#`, lo sigue (`/pagina2`, `/pagina3`…). Termina cuando no hay siguiente, y tiene guardas ante bucles (URL repetida o más de 200 páginas).
 5. Devuelve el array completo de comercios.
 
-No hay timeout, reintentos ni pausa entre páginas, y un fallo HTTP en cualquier página lanza excepción (aborta todo el scrapeo; `runScrape` lo captura y no toca Redis).
+Un fallo HTTP persistente en cualquier página lanza excepción (aborta todo el scrapeo; `runScrape` lo captura y no toca Redis). Si el scrapeo devuelve 0 comercios, `runScrape` lo trata como error y conserva el catálogo.
 
 ## Cómo repararlo si la web cambia
 1. Descargar una página real: `curl -s -A "Mozilla/5.0" "<URL>" > /tmp/page.html` y abrirla.
@@ -33,5 +33,11 @@ No hay timeout, reintentos ni pausa entre páginas, y un fallo HTTP en cualquier
 5. Comprobar que `mapsUrl` sigue trayendo `query=lat,lng` (el front lo necesita para el mapa). Si el nuevo enlace es otro formato (p. ej. `/@lat,lng` o `q=`), adaptar `extractCoordinates` en el front (`commerce-map.component.ts`) o normalizar `mapsUrl` aquí.
 6. Antes de dejar el cron en marcha con datos nuevos, vaciar/respaldar Redis si el formato de `name` cambió: el diff es por nombre y generaría cientos de altas/bajas y un email enorme.
 
-## Verificado / no verificado
-El análisis de este documento se hizo leyendo el código; **no se ha podido contrastar contra la web real** (sin acceso de red en la sesión de documentación). Verifica los selectores contra la web 2026.
+## Estructura verificada (20-oct-2026, edición 2026)
+Comprobado contra la web real: 3 páginas (20 + 20 + 19 → **59 comercios**), 13 sectores en uso (el desplegable de la web lista 18), todos con teléfono, imagen y `mapsUrl` con `query=lat,lng`. Cada tarjeta es una tabla de 4 filas (nombre, sector, teléfono, dirección); no hay indicador de disponibilidad en la tarjeta (la web tiene un filtro "solo disponibles" que guarda el filtro en **sesión** vía POST; el scraper no lo usa).
+Particularidades: el sector llega con el nombre largo oficial (p. ej. "Tecnología, informática, electrónica y electrodomésticos"); alguna dirección viene irregular y puede conservar texto extra.
+
+Probar contra la web real:
+```bash
+node -e 'require("./src/scraper").scrapeComercios().then(r=>console.log(r.length))'
+```

@@ -22,10 +22,10 @@ Consumir mejor el listado de establecimientos adheridos al programa de bonos de 
 
 ## Flujo de `runScrape(manual)` (`src/cron.js`)
 1. `scrapeComercios()` → lista nueva (todas las páginas).
-2. `getComercios()` → lista guardada.
+2. `getComercios()` → lista guardada. **Si la lista nueva está vacía se aborta** (error en log, Redis intacto).
 3. `diffComercios(antiguos, nuevos)` compara **por `name`** (`Set` de nombres).
 4. Si hay altas o bajas: `saveComercios(nuevos)`, `addHistoryEntry`, `updateSectorsFromComercios`.
-5. Si hay altas: `sendDiffEmail({ added, removed })` (el email solo lista altas).
+5. Si hay altas y ya había catálogo: `sendDiffEmail({ added, removed })` (el email solo lista altas). En la **carga inicial** (catálogo previo vacío) no se envía correo.
 6. Siempre al final: `saveLastUpdate()`.
 7. Cualquier excepción se loguea y se traga (el cron no muere).
 
@@ -49,7 +49,7 @@ Todo se guarda como un único blob JSON por clave (sin TTL). El histórico crece
 Orden de middlewares: `x-powered-by` off → `express.json()` → CORS manual (`Access-Control-Allow-Origin: *`, preflight 204) → `rateLimiter` → `requestLogger` → rutas.
 - `GET /api/status`: healthcheck (hace `redis.ping()`).
 - `/api/comercios/*`: ver [API.md](API.md).
-- Al hacer `listen`: `verifyMailer()` y luego `startCron()`. **El cron no ejecuta un scrapeo inmediato al arrancar**: el primer scrapeo ocurre en el siguiente múltiplo de 5 min (o con `force-scrape`). Con Redis vacío, el front verá 0 comercios hasta entonces.
+- Al hacer `listen`: `verifyMailer()` y luego `startCron()`. `startCron()` programa el cron y, si Redis no tiene comercios, lanza un scrapeo inicial inmediato (si ya hay datos espera al siguiente múltiplo de 5 min).
 
 ## Middlewares
 - **rateLimiter**: ventana fija por IP en un `Map` en memoria. `RATE_LIMIT_WINDOW_MS` (60000) y `RATE_LIMIT_MAX_REQUESTS` (120). Devuelve 429. Usa `req.ip`; detrás de un proxy inverso sin `trust proxy` todas las peticiones compartirán IP.

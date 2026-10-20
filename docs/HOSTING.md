@@ -19,6 +19,7 @@ El API necesita (1) un proceso Node vivo, porque el cron de 5 min corre **dentro
 
 ### 2. API en Render
 1. Sube el repo a GitHub (ya está). En Render: **New → Blueprint** y elige este repo; detectará `render.yaml` (si prefieres a mano: **New → Web Service**, runtime *Docker*, plan *Free*, health check `/api/status`).
+   - **Rama**: elige una que contenga el scraper 2026 (v1.1.0 o posterior). Siguiendo gitflow, eso significa `develop` hasta que hagas la release a `master`; si despliegas `master` antes, ejecutará el scraper antiguo (v1.0.2), que no trata bien la web 2026. El `render.yaml` no fija la rama a propósito.
 2. Rellena las variables marcadas `sync: false`:
    - `REDIS_URL` → la URL de Upstash.
    - `MAIL_USER`, `MAIL_PASS`, `MAIL_TO`, `FRONTEND_URL` (o déjalas vacías si dejas el correo desactivado).

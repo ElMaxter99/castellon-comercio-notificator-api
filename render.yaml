@@ -6,7 +6,8 @@ services:
     runtime: docker
     plan: free
     region: frankfurt
-    branch: master
+    # Sin `branch`: Render usa la rama que elijas al importar el Blueprint (por defecto la del repo).
+    # Ojo: debe contener el scraper 2026 (v1.1.0+); `master` hasta publicar una release sigue en v1.0.2.
     autoDeploy: true
     healthCheckPath: /api/status
     envVars:

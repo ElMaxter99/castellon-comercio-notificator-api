@@ -1,0 +1,53 @@
+# CLAUDE.md — castellon-comercio-notificator-api
+
+Guía para Claude Code. Léela entera antes de tocar nada.
+
+## Qué es
+Backend Node.js/Express que **scrapea cada 5 min** el listado oficial de establecimientos adheridos al programa de bonos de Castelló de la Plana (`bonoscastellodelaplana.es`), lo guarda en **Redis**, calcula **altas/bajas** respecto a la ejecución anterior, guarda un **histórico** y **envía un email** cuando hay comercios nuevos. Expone todo por REST para el front (repo `castellon-comercio-notificator-front`).
+
+Proyecto independiente y sin ánimo de lucro; no tiene relación oficial con el Ayuntamiento.
+
+## Mapa rápido
+| Fichero | Rol |
+|---|---|
+| `src/app.js` | Arranque Express: CORS `*`, rate limiter, logger HTTP, rutas, `/api/status`, verifica SMTP y lanza el cron |
+| `src/cron.js` | `runScrape(manual)` + `startCron()` (`*/5 * * * *`) |
+| `src/scraper/index.js` | axios + cheerio, recorre la paginación de la web oficial. **Punto más frágil** |
+| `src/routes/comercios.js` | Endpoints `/api/comercios/*` |
+| `src/services/redisService.js` | Lectura/escritura en Redis (claves `ENV:NAMESPACE:nombre`) |
+| `src/services/mailService.js` | nodemailer, `sendDiffEmail` (solo altas) |
+| `src/services/templateService.js` + `src/templates/updateEmail.html` | Render del email (escapa HTML) |
+| `src/utils/diff.js` | Diff por **nombre** (altas/bajas) |
+| `src/middleware/rateLimiter.js` | Límite en memoria por IP |
+| `scripts/*.sh`, `scripts/syncSectors.js` | Operación Docker y reparación de sectores |
+
+## Documentación detallada (`docs/`)
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — flujo de datos, módulos, Redis, decisiones.
+- [`docs/API.md`](docs/API.md) — todos los endpoints con ejemplos.
+- [`docs/SCRAPER.md`](docs/SCRAPER.md) — cómo funciona el scraping y cómo repararlo si la web cambia.
+- [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — variables de entorno, Docker, despliegue, logs.
+- [`docs/REUSE-2026.md`](docs/REUSE-2026.md) — **checklist para reutilizar el proyecto en la edición 2026**.
+
+## Comandos
+```bash
+npm install
+npm start                 # node src/app.js (necesita Redis accesible)
+docker compose up --build # API + Redis
+node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
+```
+No hay tests, linter ni build step.
+
+## Convenciones
+- CommonJS (`require`), Node ≥ 22 (el Dockerfile usa `node:25.1.0-trixie-slim`).
+- Logs siempre vía `src/utils/logger.js` con `{ context, meta }`; no usar `console.log` directo.
+- Mensajes de log y textos de usuario en español.
+- Cada release actualiza `CHANGELOG.md` y `version` de `package.json` (flujo gitflow: `develop`, `release/vX.Y.Z`, `master`).
+- No commitear `.env` (ignorado). Plantilla en `.env.example`.
+
+## Trampas conocidas (no las "arregles" sin preguntar)
+1. El scraper usa **selectores CSS acoplados al HTML** de la web oficial; si no devuelve nada, ver `docs/SCRAPER.md`.
+2. `runScrape` **guarda en Redis solo si hay diferencias**, y `saveLastUpdate` se ejecuta aunque no las haya.
+3. Si el scrapeo devuelve 0 comercios (web caída/cambiada), el diff marcará **todos como "removed"** y se vaciará el catálogo. Hay una mejora propuesta en `docs/REUSE-2026.md`.
+4. `POST /api/comercios/force-scrape` **no tiene autenticación**.
+5. `BASE_URL` del scraper es `http://` (no https).
+6. `package-lock.json` está en `.gitignore`.

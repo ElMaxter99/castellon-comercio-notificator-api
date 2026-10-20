@@ -18,7 +18,7 @@ Todos los comercios guardados (`[]` si Redis está vacío).
   "sector": "Alimentación",
   "phone": "964 123 456",
   "address": "C/ Mayor, 12",
-  "img": "http://bonoscastellodelaplana.es/uploads/panaderia.jpg",
+  "img": "https://bonoscastellodelaplana.es/imagenes/usuariosWeb/panaderia.jpg",
   "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.98,-0.03"
 }]
 ```

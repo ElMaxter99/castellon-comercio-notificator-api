@@ -31,8 +31,16 @@ Variables importantes (detalle en [OPERATIONS.md](OPERATIONS.md)):
 - `TRUST_PROXY=1` → sin esto el rate limit ve la IP del proxy de Render y **todos los usuarios comparten el mismo límite** (120/min).
 - `REDIS_NAMESPACE=bonos2026` → separa los datos de cada edición.
 
-### 3. Pinger (imprescindible en el plan gratuito)
-Render duerme el servicio tras 15 min sin tráfico y, al dormir, el cron deja de ejecutarse. Crea un monitor HTTP gratuito que haga `GET https://TU-SERVICIO.onrender.com/api/status` **cada 5 minutos**. Con eso el servicio no llega a dormirse y el cron sigue su ritmo.
+### 3. Monitor externo (imprescindible en el plan gratuito)
+Render duerme el servicio tras 15 min sin tráfico y, al dormir, el cron deja de ejecutarse. Crea un monitor HTTP gratuito (UptimeRobot, cron-job.org…) que haga `GET https://TU-SERVICIO.onrender.com/api/health` **cada 5 minutos**:
+- Mantiene el servicio despierto y el cron sigue su ritmo.
+- **Te avisa** (el monitor marca "caído" con un 503) si Redis falla o si los datos llevan más de 15 minutos sin actualizarse, que es justo el síntoma de un cron parado o un scrapeo roto. Activa las alertas por correo del monitor.
+- `/api/status` sigue valiendo como simple comprobación de que el proceso responde.
+
+**Respaldo con GitHub Actions** (opcional): un workflow programado que llame a `/api/health` y falle si no responde 200; GitHub te avisa por correo cuando falla. Es gratis, pero el mínimo es de 5 minutos, suele retrasarse y se desactiva tras 60 días sin actividad en el repo. Está en `.github/workflows/uptime.yml`: define la variable de repositorio `API_URL` (*Settings → Secrets and variables → Actions → Variables*) con la URL del API.
+
+### 3b. Token de administración
+Para poder usar `POST /api/comercios/force-scrape` define `FORCE_SCRAPE_TOKEN` en Render (`openssl rand -hex 32`). Sin él la ruta está deshabilitada. Úsalo con `Authorization: Bearer <token>`.
 
 ### 4. Conectar el front
 En el repo del front cambia `apiBaseUrl` en `src/environments/environment.prod.ts` y `environment.test.ts` (y los `mock.*` si se usan) por `https://TU-SERVICIO.onrender.com`, y vuelve a desplegar.
@@ -66,7 +74,9 @@ Una VM ARM siempre encendida permite usar `docker-compose.yml` tal cual (Redis i
 | `ECONNREFUSED`/error TLS a Redis | Usaste `redis://` en vez de `rediss://`, o `NODE_ENV` distinto de `prod` |
 | `Too many requests` con poco tráfico | Falta `TRUST_PROXY=1` |
 | El cron "se para" | El pinger no está activo y Render durmió el servicio |
-| 0 comercios | Mira logs `SCRAPER`/`CRON`; lanza `POST /api/comercios/force-scrape` |
+| 0 comercios | Mira logs `SCRAPER`/`CRON`; lanza `POST /api/comercios/force-scrape` con el token |
+| `/api/health` da 503 | Datos sin actualizar >15 min: mira los logs `CRON`/`SCRAPER` (¿el servicio estuvo dormido? ¿la web oficial falla?) |
+| `force-scrape` da 403 / 401 | Falta `FORCE_SCRAPE_TOKEN` en el servidor / token incorrecto |
 | Email no llega / `Resend rechazó el envío` 403 | `MAIL_FROM` de un dominio sin verificar, o destinatario distinto al de tu cuenta usando `onboarding@resend.dev` |
 | SMTP: timeout / `ETIMEDOUT` en Render | Render gratis bloquea 25/465/587: usa `MAIL_PROVIDER=resend` |
 | Email enorme tras cambiar de edición | Reutilizaste el namespace de Redis: usa uno nuevo |

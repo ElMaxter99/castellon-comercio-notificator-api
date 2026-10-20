@@ -13,7 +13,7 @@ Guía para volver a poner en marcha el sistema con el programa de bonos 2026. Tr
 2. ~~Ajustar `BASE_URL` y selectores~~ Hecho para 2026; reverificar con `scrapeComercios()` si la web cambia.
 3. Actualizar textos con "2025"/edición si aparecen (README, plantilla de email, remitente "Bonos Castelló API").
 4. Subir versión (`package.json` + `CHANGELOG.md`) siguiendo el flujo gitflow.
-5. `docker compose up -d --build`, lanzar `POST /api/comercios/force-scrape` y verificar `/api/comercios/status`.
+5. `docker compose up -d --build`, lanzar `POST /api/comercios/force-scrape` (con `Authorization: Bearer $FORCE_SCRAPE_TOKEN`) y verificar `/api/comercios/status`.
 6. ~~Primer scrapeo = email gigante~~ Resuelto: la carga inicial (Redis vacío) no envía correo.
 7. Actualizar `apiBaseUrl` en el front (ver su `docs/REUSE-2026.md`).
 8. Revisar dependencias vulnerables (`npm audit`) y la imagen Node del Dockerfile.
@@ -21,7 +21,7 @@ Guía para volver a poner en marcha el sistema con el programa de bonos 2026. Tr
 ## 2. Mejoras recomendadas (no implementadas)
 Ordenadas por valor:
 1. ~~Guarda contra scrapeo vacío~~ Hecho (solo cubre 0 comercios; se podría ampliar a caídas >50%).
-2. **Proteger `force-scrape`** con token (`Authorization: Bearer`) o quitarlo del acceso público.
+2. ~~Proteger `force-scrape`~~ Hecho (`FORCE_SCRAPE_TOKEN`; sin él la ruta está deshabilitada).
 3. ~~Scrapeo inicial al arrancar~~ Hecho.
 4. **Diff por clave estable** (nombre+dirección) y detectar modificaciones, no solo altas/bajas.
 5. ~~Timeouts/reintentos y HTTPS~~ Hecho (falta pausa entre páginas).

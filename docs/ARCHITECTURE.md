@@ -31,6 +31,11 @@ Consumir mejor el listado de establecimientos adheridos al programa de bonos de 
 
 Consecuencias del diff por nombre: si un comercio cambia teléfono/dirección/imagen pero no nombre, **no se detecta ni se guarda** el cambio. Dos comercios con el mismo nombre (sucursales) se colapsan en el diff.
 
+## Saneado, administración y salud
+- `utils/geo.js` limpia coordenadas atípicas tras el scrapeo (ver [SCRAPER.md](SCRAPER.md)).
+- `middleware/adminAuth.js` protege `force-scrape` con `FORCE_SCRAPE_TOKEN` (comparación en tiempo constante; deshabilitada si no hay token). `runScrape` devuelve `{ ok, changed, total, added, removed }` o `{ ok: false, error }`, y la ruta responde 502 si falla.
+- `GET /api/health` (`utils/health.js`) detecta datos parados para los monitores externos.
+
 ## Redis (`src/config/redis.js`, `src/services/redisService.js`)
 - Clave: `${NODE_ENV}:${REDIS_NAMESPACE}:${nombre}`; p. ej. `prod:bonos:comercios`.
 - DB según entorno: `prod` → 0, `staging` → 1, cualquier otro → 2.

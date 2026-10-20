@@ -56,7 +56,7 @@ flowchart LR
 - 💾 **Guarda en Redis** el catálogo, los sectores, la fecha del último scrapeo y el **histórico** de altas y bajas.
 - ✉️ **Avisa por correo** cuando aparecen comercios nuevos, con **SMTP tradicional o [Resend](https://resend.com)**.
 - 📦 **Expone una API REST** para el front: listado, estado, histórico, sectores y filtro.
-- 🛡️ **Robusto**: no vacía el catálogo si la web falla, limita peticiones por IP, escapa el HTML del correo y reintenta las descargas.
+- 🛡️ **Robusto**: no vacía el catálogo si la web falla, limpia coordenadas erróneas, limita peticiones por IP, escapa el HTML del correo y reintenta las descargas.
 - 🐳 **Despliegue sencillo**: Docker Compose o gratis con Render + Upstash ([guía](docs/HOSTING.md)).
 
 ## 🔄 Cómo funciona
@@ -106,6 +106,7 @@ Necesitas **Node.js ≥ 22** y un Redis accesible (`REDIS_HOST=localhost` en `.e
 ```bash
 npm install
 npm start
+npm test      # tests (runner integrado de Node)
 ```
 
 Con Redis vacío, el primer arranque hace un **scrapeo inicial** (sin enviar correo). Comprueba que todo va bien:
@@ -133,6 +134,8 @@ Copia [`.env.example`](.env.example). Las variables principales:
 | `MAIL_HOST`/`PORT`/`USER`/`PASS` | Solo SMTP (en Gmail, contraseña de aplicación) |
 | `RESEND_API_KEY` · `MAIL_FROM` | Solo Resend (el remitente debe ser de un dominio verificado) |
 | `FRONTEND_URL` | Enlace que aparece en el correo |
+| `FORCE_SCRAPE_TOKEN` | Token de `force-scrape` (sin definir, la ruta está deshabilitada) |
+| `HEALTH_MAX_AGE_MINUTES` | Antigüedad máxima de los datos para `/api/health` (15) |
 | `TRUST_PROXY` · `RATE_LIMIT_*` | Proxy inverso (Render = 1) y límite de peticiones por IP |
 
 Todas, con su valor por defecto, en [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
@@ -149,7 +152,8 @@ Base: `http://localhost:12001`. CORS abierto; límite por defecto de 120 peticio
 | `GET` | `/api/comercios/history` | Histórico de altas y bajas (el más reciente primero) |
 | `GET` | `/api/comercios/sectors` | Sectores disponibles |
 | `GET` | `/api/comercios/filter?name=&sector=` | Comercios filtrados por nombre o sector |
-| `POST` | `/api/comercios/force-scrape` | Fuerza un scrapeo ahora ⚠️ sin autenticación |
+| `GET` | `/api/health` | Salud para monitores: 503 si Redis falla o los datos llevan >15 min sin actualizarse |
+| `POST` | `/api/comercios/force-scrape` 🔒 | Fuerza un scrapeo ahora (requiere `Authorization: Bearer $FORCE_SCRAPE_TOKEN`) |
 
 Ejemplo de comercio (datos ficticios):
 
@@ -200,7 +204,7 @@ La documentación de la interfaz (ediciones, entornos, diseño) está en el [rep
 ## 🛡️ Buenas prácticas
 
 - Mantén el cron en intervalos razonables para no sobrecargar la web origen.
-- Protege `force-scrape` (token o red privada) antes de exponer el API.
+- Define un `FORCE_SCRAPE_TOKEN` largo (`openssl rand -hex 32`) si vas a usar `force-scrape`, y monitoriza `/api/health` con alertas.
 - Despliega tras HTTPS y revisa los logs; configura alertas de errores de Redis o de envío.
 - Usa un `REDIS_NAMESPACE` distinto en cada edición del programa.
 

@@ -2,6 +2,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 
 const logger = require("../utils/logger");
+const { sanitizeAll } = require("../utils/geo");
 
 const SITE_ORIGIN = "https://bonoscastellodelaplana.es";
 const BASE_URL = `${SITE_ORIGIN}/establecimientos-adheridos-al-programa`;
@@ -122,11 +123,19 @@ async function scrapeComercios() {
     page++;
   }
 
+  const { commerces, fixed, excluded } = sanitizeAll(allComercios);
+  if (fixed.length || excluded.length) {
+    logger.warn("Coordenadas atípicas en la web oficial", {
+      context: "SCRAPER",
+      meta: { corregidos: fixed, excluidos: excluded },
+    });
+  }
+
   logger.success("Scrapeo completado", {
     context: "SCRAPER",
-    meta: { total: allComercios.length, pages: visited.size },
+    meta: { total: commerces.length, pages: visited.size, corregidos: fixed.length, excluidos: excluded.length },
   });
-  return allComercios;
+  return commerces;
 }
 
 module.exports = { scrapeComercios, scrapePage, cleanAddress, toAbsoluteUrl };

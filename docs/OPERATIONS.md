@@ -5,6 +5,9 @@
 |---|---|---|
 | `NODE_ENV` | `dev` | `prod`→Redis DB 0, `staging`→1, otro→2; prefijo de claves |
 | `PORT` | `12001` | Puerto HTTP |
+| `FORCE_SCRAPE_TOKEN` | — | Token de `POST /api/comercios/force-scrape` (`Authorization: Bearer`). Sin definir, la ruta está deshabilitada. Genera uno largo: `openssl rand -hex 32` |
+| `HEALTH_MAX_AGE_MINUTES` | `15` | Antigüedad máxima de los datos para que `/api/health` responda 200 |
+| `GEO_CENTER_LAT` · `GEO_CENTER_LNG` · `GEO_RADIUS_KM` · `GEO_CITY` | Castelló · 30 km | Zona válida para las coordenadas de los comercios (ver `SCRAPER.md`) |
 | `TRUST_PROXY` | — | Nº de proxies inversos delante (Render = 1). Necesario para que el rate limit distinga IPs |
 | `RATE_LIMIT_WINDOW_MS` | `60000` | Ventana del rate limit |
 | `RATE_LIMIT_MAX_REQUESTS` | `120` | Máx. peticiones por IP y ventana |
@@ -33,7 +36,9 @@ Redis accesible (`REDIS_HOST=localhost`), `npm install`, `npm start`. Atención:
 - `logs/access.log`: una línea por petición. No rota; en Docker no es un volumen, se pierde al recrear el contenedor.
 
 ## Mantenimiento habitual
-- Forzar scrapeo: `curl -X POST <api>/api/comercios/force-scrape`.
+- Forzar scrapeo: `curl -X POST -H "Authorization: Bearer $FORCE_SCRAPE_TOKEN" <api>/api/comercios/force-scrape`.
+- Comprobar la salud de los datos: `curl <api>/api/health` (503 si el scrapeo está parado).
+- Tests: `npm test` (runner integrado de Node, sin dependencias).
 - Reconstruir sectores: `docker compose exec app node scripts/syncSectors.js`.
 - Ver datos: `docker compose exec redis redis-cli -a $REDIS_PASSWORD -n <db> GET prod:bonos:comercios`.
 - Reiniciar de cero una edición: borrar claves `*:bonos:comercios|history|sectors|last-update` (ver `REUSE-2026.md`).

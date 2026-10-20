@@ -6,6 +6,7 @@ const {
   getSectors,
 } = require("../services/redisService");
 const { runScrape } = require("../cron");
+const requireAdminToken = require("../middleware/adminAuth");
 const logger = require("../utils/logger");
 
 const router = express.Router();
@@ -67,12 +68,15 @@ router.get("/history", async (req, res) => {
 });
 
 /**
- * Forzar scrapeo manual
+ * Forzar scrapeo manual (requiere `Authorization: Bearer $FORCE_SCRAPE_TOKEN`)
  */
-router.post("/force-scrape", async (req, res) => {
+router.post("/force-scrape", requireAdminToken, async (req, res) => {
   try {
-    await runScrape(true);
-    res.json({ ok: true, message: "Scrapeo manual completado." });
+    const result = await runScrape(true);
+    if (!result.ok) {
+      return res.status(502).json({ ok: false, error: result.error });
+    }
+    res.json({ ...result, message: "Scrapeo manual completado." });
   } catch (err) {
     logger.error("Error ejecutando scrapeo manual", {
       context: "ROUTE:FORCE_SCRAPE",

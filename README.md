@@ -7,6 +7,12 @@ El servicio se encarga de monitorizar periódicamente la web oficial de bonos mu
 
 ---
 
+## 📚 Documentación para desarrolladores (y para Claude)
+- [`CLAUDE.md`](CLAUDE.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/API.md`](docs/API.md) · [`docs/SCRAPER.md`](docs/SCRAPER.md) · [`docs/OPERATIONS.md`](docs/OPERATIONS.md) · [`docs/REUSE-2026.md`](docs/REUSE-2026.md)
+- Frontend: [castellon-comercio-notificator-front](https://github.com/ElMaxter99/castellon-comercio-notificator-front)
+
+---
+
 ## 🚀 Características principales
 - 🔁 Scrapeo automático y programable mediante `cron`.
 - 💾 Almacenamiento en **Redis** con separación por entorno (`dev`, `staging`, `prod`).

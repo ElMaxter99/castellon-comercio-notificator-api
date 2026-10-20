@@ -11,6 +11,7 @@
 
 [![Web pública](https://img.shields.io/badge/%F0%9F%8C%90%20web%20p%C3%BAblica-bono--castellon.alvaromaxter.es-1E4D2B?style=for-the-badge)](https://bono-castellon.alvaromaxter.es/)
 
+[![CI](https://github.com/ElMaxter99/castellon-comercio-notificator-api/actions/workflows/ci.yml/badge.svg)](https://github.com/ElMaxter99/castellon-comercio-notificator-api/actions/workflows/ci.yml)
 [![Versión](https://img.shields.io/github/package-json/v/ElMaxter99/castellon-comercio-notificator-api?style=flat-square&color=1E4D2B&label=versi%C3%B3n)](CHANGELOG.md)
 [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A5%2022-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Express](https://img.shields.io/badge/Express-4-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com)
@@ -106,7 +107,7 @@ Necesitas **Node.js ≥ 22** y un Redis accesible (`REDIS_HOST=localhost` en `.e
 ```bash
 npm install
 npm start
-npm test      # tests (runner integrado de Node)
+npm test      # tests (runner integrado de Node; el CI los ejecuta en cada PR)
 ```
 
 Con Redis vacío, el primer arranque hace un **scrapeo inicial** (sin enviar correo). Comprueba que todo va bien:

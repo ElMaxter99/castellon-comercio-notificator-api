@@ -1,0 +1,94 @@
+# Integración continua del API: tests, comprobación de sintaxis, arranque real con Redis y build de la imagen.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [develop, master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # No se versiona package-lock.json, así que no se usa `npm ci` ni la caché de npm.
+      - name: Instalar dependencias
+        run: npm install --no-audit --no-fund
+
+      - name: Comprobar sintaxis
+        run: find src scripts test -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Tests
+        run: npm test
+
+  smoke:
+    # Arranca el API contra un Redis real y comprueba los endpoints de salud.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependencias
+        run: npm install --omit=dev --no-audit --no-fund
+
+      - name: Arrancar y comprobar /api/status y /api/health
+        env:
+          NODE_ENV: prod
+          PORT: "12001"
+          REDIS_HOST: localhost
+          REDIS_PORT: "6379"
+          MAIL_ENABLED: "false"
+        run: |
+          node src/app.js > api.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:12001/api/status && break
+            sleep 1
+          done
+          echo
+          curl -fsS http://localhost:12001/api/status
+          echo
+          # Recién arrancado hay periodo de gracia: debe responder 200 aunque aún no haya datos.
+          curl -fsS http://localhost:12001/api/health
+          echo
+          # Sin FORCE_SCRAPE_TOKEN la ruta de administración debe estar deshabilitada.
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:12001/api/comercios/force-scrape)" = "403"
+
+      - name: Logs del API
+        if: always()
+        run: cat api.log || true
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir la imagen
+        run: docker build -t castellon-comercio-api:ci .

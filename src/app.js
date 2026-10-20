@@ -2,6 +2,8 @@ const express = require("express");
 const comerciosRouter = require("./routes/comercios");
 const { startCron } = require("./cron");
 const { redis } = require("./config/redis");
+const { getLastUpdate } = require("./services/redisService");
+const { evaluateHealth } = require("./utils/health");
 const { verifyMailer } = require("./services/mailService");
 const requestLogger = require("./middleware/logger");
 const rateLimiter = require("./middleware/rateLimiter");
@@ -53,6 +55,34 @@ app.get("/api/status", async (req, res) => {
       context: "APP",
       meta: e,
     });
+    res.status(500).json({ ok: false, error: "Redis unreachable" });
+  }
+});
+
+// Salud para monitores externos (UptimeRobot, etc.): 503 si Redis falla o si los datos
+// llevan demasiado tiempo sin actualizarse (el cron no está corriendo o el scrapeo falla).
+const HEALTH_MAX_AGE_MINUTES = Number(process.env.HEALTH_MAX_AGE_MINUTES || 15);
+
+app.get("/api/health", async (req, res) => {
+  try {
+    const redisStatus = await redis.ping();
+    const lastUpdate = await getLastUpdate();
+    const health = evaluateHealth({
+      lastUpdate,
+      uptimeSeconds: process.uptime(),
+      maxAgeMinutes: HEALTH_MAX_AGE_MINUTES,
+    });
+
+    res.status(health.ok ? 200 : 503).json({
+      ok: health.ok,
+      redis: redisStatus,
+      lastUpdate: lastUpdate ? lastUpdate.toISOString() : null,
+      ageMinutes: health.ageMinutes,
+      maxAgeMinutes: HEALTH_MAX_AGE_MINUTES,
+      ...(health.stale ? { error: "Datos sin actualizar: el scrapeo no se está completando" } : {}),
+    });
+  } catch (e) {
+    logger.error("Redis unreachable desde /api/health", { context: "APP", meta: e });
     res.status(500).json({ ok: false, error: "Redis unreachable" });
   }
 });

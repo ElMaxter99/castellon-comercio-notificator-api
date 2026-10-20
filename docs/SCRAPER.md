@@ -22,6 +22,13 @@ Es la pieza más frágil: depende del HTML de la web oficial. Si el Ayuntamiento
 
 Un fallo HTTP persistente en cualquier página lanza excepción (aborta todo el scrapeo; `runScrape` lo captura y no toca Redis). Si el scrapeo devuelve 0 comercios, `runScrape` lo trata como error y conserva el catálogo.
 
+## Saneado de coordenadas (`src/utils/geo.js`)
+La web oficial geocodifica mal a algunos comercios (p. ej. una avenida de Castelló situada en Alicante) y contiene alguna entrada ajena. Un solo punto lejano rompe el mapa del front, así que tras el scrapeo se aplica:
+- **Dentro de la zona** (30 km alrededor de Castelló, configurable con `GEO_*`) → sin cambios.
+- **Fuera de la zona** → se sustituye `mapsUrl` por una búsqueda de Google Maps por dirección (`…/maps/search/?api=1&query=<dirección>, Castelló de la Plana`). El comercio sigue en la lista, "Cómo llegar" funciona y el front simplemente no dibuja su marcador (no hay `lat,lng`).
+- **Fuera de la zona y con código postal de otra provincia** (distinto de `12xxx`) → se **excluye** del catálogo (p. ej. el proveedor de la web, en León).
+Los casos corregidos y excluidos se registran en un `WARN` `[SCRAPER]` con su distancia. Con los datos del 20-oct-2026: 3 corregidos y 1 excluido de 71.
+
 ## Cómo repararlo si la web cambia
 1. Descargar una página real: `curl -s -A "Mozilla/5.0" "<URL>" > /tmp/page.html` y abrirla.
 2. Localizar el contenedor repetido de cada comercio y actualizar el selector de `$(".col-...")`.

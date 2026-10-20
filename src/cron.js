@@ -28,7 +28,7 @@ async function runScrape(manual = false) {
         context: "CRON",
         meta: { previos: antiguos.length },
       });
-      return;
+      return { ok: false, error: "El scrapeo no devolvió comercios; se conserva el catálogo anterior." };
     }
 
     const diff = diffComercios(antiguos, nuevos);
@@ -76,8 +76,16 @@ async function runScrape(manual = false) {
     }
 
     await saveLastUpdate();
+    return {
+      ok: true,
+      changed: diff.added.length > 0 || diff.removed.length > 0,
+      total: nuevos.length,
+      added: diff.added.length,
+      removed: diff.removed.length,
+    };
   } catch (err) {
     logger.error("Error en scrapeo", { context: "CRON", meta: err });
+    return { ok: false, error: err.message };
   }
 }
 

@@ -9,7 +9,7 @@ Guía para volver a poner en marcha el sistema con el programa de bonos 2026. Tr
 > **Estado (v1.1.0)**: el scraper ya está adaptado y verificado contra la web 2026 (59 comercios, 3 páginas), usa https, y se han implementado la guarda de scrapeo vacío y el scrapeo inicial. Ver [SCRAPER.md](SCRAPER.md).
 
 ## 1. Checklist de puesta en marcha
-1. `cp .env.example .env` y rellenar Redis y SMTP. **Importante**: usar un `REDIS_NAMESPACE` nuevo (p. ej. `bonos2026`) o vaciar las claves 2025; si no, el primer scrapeo 2026 se compara con el catálogo 2025 y genera bajas/altas masivas y un email enorme.
+1. `cp .env.example .env` y rellenar Redis y correo (SMTP o Resend). **Importante**: usar un `REDIS_NAMESPACE` nuevo (p. ej. `bonos2026`) o vaciar las claves 2025; si no, el primer scrapeo 2026 se compara con el catálogo 2025 y genera bajas/altas masivas y un email enorme.
 2. ~~Ajustar `BASE_URL` y selectores~~ Hecho para 2026; reverificar con `scrapeComercios()` si la web cambia.
 3. Actualizar textos con "2025"/edición si aparecen (README, plantilla de email, remitente "Bonos Castelló API").
 4. Subir versión (`package.json` + `CHANGELOG.md`) siguiendo el flujo gitflow.

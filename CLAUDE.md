@@ -10,12 +10,12 @@ Proyecto independiente y sin ánimo de lucro; no tiene relación oficial con el 
 ## Mapa rápido
 | Fichero | Rol |
 |---|---|
-| `src/app.js` | Arranque Express: CORS `*`, rate limiter, logger HTTP, rutas, `/api/status`, verifica SMTP y lanza el cron |
+| `src/app.js` | Arranque Express: CORS `*`, rate limiter, logger HTTP, rutas, `/api/status`, verifica el correo y lanza el cron |
 | `src/cron.js` | `runScrape(manual)` + `startCron()` (`*/5 * * * *`) |
 | `src/scraper/index.js` | axios + cheerio, recorre la paginación de la web oficial. **Punto más frágil** |
 | `src/routes/comercios.js` | Endpoints `/api/comercios/*` |
 | `src/services/redisService.js` | Lectura/escritura en Redis (claves `ENV:NAMESPACE:nombre`) |
-| `src/services/mailService.js` | nodemailer, `sendDiffEmail` (solo altas) |
+| `src/services/mailService.js` | Email con proveedor `smtp` (nodemailer) o `resend` (API HTTPS), `sendDiffEmail` (solo altas) |
 | `src/services/templateService.js` + `src/templates/updateEmail.html` | Render del email (escapa HTML) |
 | `src/utils/diff.js` | Diff por **nombre** (altas/bajas) |
 | `src/middleware/rateLimiter.js` | Límite en memoria por IP |

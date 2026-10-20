@@ -46,7 +46,8 @@ REDIS_PORT=6379
 REDIS_NAMESPACE=bonos
 REDIS_PASSWORD=supersecurepass
 
-# Correo (SMTP)
+# Correo: MAIL_PROVIDER=smtp (por defecto) o resend
+MAIL_PROVIDER=smtp
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=465
 MAIL_SECURE=true
@@ -54,6 +55,10 @@ MAIL_USER=tuemail@gmail.com
 MAIL_PASS=app_password_generado
 MAIL_TO=destinatario@gmail.com
 MAIL_ENABLED=true
+
+# Solo con MAIL_PROVIDER=resend (API HTTPS)
+# RESEND_API_KEY=re_xxxxxxxxxxxx
+# MAIL_FROM=Bonos Castelló <avisos@tudominio.es>
 
 # URL del frontend (opcional)
 FRONTEND_URL=http://localhost:4200

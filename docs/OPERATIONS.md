@@ -12,9 +12,12 @@
 | `REDIS_HOST` / `REDIS_PORT` | `redis` / `6379` | |
 | `REDIS_PASSWORD` | — | También lo usa `docker-compose` para `--requirepass` |
 | `REDIS_NAMESPACE` | `bonos` | Segundo segmento de las claves |
-| `MAIL_HOST` `MAIL_PORT` `MAIL_SECURE` `MAIL_USER` `MAIL_PASS` | puerto 587 | SMTP (en Gmail, contraseña de aplicación). `secure` si `MAIL_SECURE=true` o puerto 465 |
-| `MAIL_TO` | — | Destinatario de las alertas |
-| `MAIL_ENABLED` | `true` | `false` desactiva envío y verificación SMTP |
+| `MAIL_PROVIDER` | `smtp` | `smtp` o `resend` (ver [Email](ARCHITECTURE.md#email)) |
+| `MAIL_HOST` `MAIL_PORT` `MAIL_SECURE` `MAIL_USER` `MAIL_PASS` | puerto 587 | Solo `smtp` (en Gmail, contraseña de aplicación). `secure` si `MAIL_SECURE=true` o puerto 465 |
+| `RESEND_API_KEY` | — | Solo `resend`: API key (`re_...`) |
+| `MAIL_FROM` | smtp: `"Bonos Castelló API" <MAIL_USER>`; resend: `onboarding@resend.dev` | Remitente. Con Resend debe ser de un dominio verificado |
+| `MAIL_TO` | — | Destinatario(s) de las alertas, separados por comas |
+| `MAIL_ENABLED` | `true` | `false` desactiva envío y verificación |
 | `FRONTEND_URL` | web oficial | Enlace del email |
 
 ## Docker

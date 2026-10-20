@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.0 - 2026-10-20
+### Agregado
+- Envío de correo con **Resend** (API HTTPS) como alternativa al SMTP tradicional: `MAIL_PROVIDER=smtp|resend`, `RESEND_API_KEY` y `MAIL_FROM`. Necesario en Render gratis, que bloquea el SMTP saliente.
+- `MAIL_TO` admite varios destinatarios separados por comas; `MAIL_FROM` opcional también en SMTP.
+
+### Cambio
+- `render.yaml` y `docs/HOSTING.md` usan Resend; la guía anterior recomendaba Gmail por SMTP, que no funciona en Render gratis.
+
 ## v1.1.1 - 2026-10-20
 ### Agregado
 - `render.yaml` (Blueprint de Render) y `docs/HOSTING.md` con la guía de hosting gratuito (Render + Upstash + pinger).

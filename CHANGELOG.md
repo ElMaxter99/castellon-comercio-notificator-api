@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2.2 - 2026-10-21
+
+### Docs
+- README: sección «Privacidad y datos personales» (qué registra la API, IP incluida, y cuánto se conserva), alineada con la página `/privacidad` del front.
+- `OPERATIONS`, `ARCHITECTURE` y `REUSE-2026` corregidos: el log de accesos ya rota con `rotating-file-stream` (antes decían que no rotaba y que la dependencia no se usaba).
+
 ## v2.2.1 - 2026-10-20
 
 ### Seguridad

@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.7.0 - 2026-10-21
+
+### Añadido
+- **Histórico acotado**: Redis guarda como máximo `HISTORY_MAX_ENTRIES` entradas (500 por defecto; las más antiguas se descartan al añadir, también si ya había más). Evita que el JSON único crezca sin límite en Upstash y que `/history` pese cada vez más.
+- `GET /api/comercios/history?limit=N` devuelve solo las N últimas entradas (sin `limit`, todo el histórico guardado, como antes).
+- Tests: 75 (4 nuevos).
+
 ## v2.6.0 - 2026-10-21
 
 ### Añadido

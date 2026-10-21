@@ -13,6 +13,7 @@
 | `GEO_CENTER_LAT` · `GEO_CENTER_LNG` · `GEO_RADIUS_KM` · `GEO_CITY` | Castelló · 30 km | Zona válida para las coordenadas de los comercios (ver `SCRAPER.md`) |
 | `TRUST_PROXY` | — | Nº de proxies inversos delante (Render = 1). Necesario para que el rate limit distinga IPs |
 | `RATE_LIMIT_WINDOW_MS` | `60000` | Ventana del rate limit |
+| `HISTORY_MAX_ENTRIES` | `500` | Tope del histórico de altas/bajas en Redis; al añadir se descartan las más antiguas |
 | `RATE_LIMIT_MAX_REQUESTS` | `120` | Máx. peticiones por IP y ventana |
 | `REDIS_URL` | — | Si existe, ignora host/port/password |
 | `CACHE_MAX_AGE_SECONDS` | `60` | `Cache-Control: public, max-age=N` en los GET de `/api/comercios/*` (con `ETag`, tras caducar se revalida con 304). `0` → `no-cache`. `/api/status` y `/api/health`: `no-store` |

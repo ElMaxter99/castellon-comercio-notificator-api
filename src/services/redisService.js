@@ -1,4 +1,5 @@
 const { redis, ENV, NAMESPACE } = require("../config/redis");
+const { pushHistory } = require("../utils/history");
 
 function key(name) {
   return `${ENV}:${NAMESPACE}:${name}`;
@@ -38,8 +39,7 @@ async function addHistoryEntry({ added, removed, total }) {
   const existing = await redis.get(keyHistory);
   const history = existing ? JSON.parse(existing) : [];
 
-  history.unshift(entry);
-  await redis.set(keyHistory, JSON.stringify(history));
+  await redis.set(keyHistory, JSON.stringify(pushHistory(history, entry)));
 }
 
 async function getHistory() {

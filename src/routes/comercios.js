@@ -8,6 +8,7 @@ const {
 const { runScrape } = require("../cron");
 const requireAdminToken = require("../middleware/adminAuth");
 const logger = require("../utils/logger");
+const { parseLimit } = require("../utils/history");
 
 const router = express.Router();
 
@@ -57,7 +58,8 @@ router.get("/status", async (req, res) => {
 router.get("/history", async (req, res) => {
   try {
     const history = await getHistory();
-    res.json(history);
+    const limit = parseLimit(req.query.limit);
+    res.json(limit ? history.slice(0, limit) : history);
   } catch (err) {
     logger.error("Error obteniendo histórico", {
       context: "ROUTE:HISTORY",

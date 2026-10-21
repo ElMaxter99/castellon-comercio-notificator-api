@@ -130,6 +130,7 @@ Copia [`.env.example`](.env.example). Las variables principales:
 | `NODE_ENV` · `PORT` | Entorno (`prod` → Redis DB 0) y puerto (por defecto 12001) |
 | `REDIS_URL` *(o `REDIS_HOST`/`PORT`/`PASSWORD`)* | Conexión a Redis (`rediss://` en servicios con TLS) |
 | `CACHE_MAX_AGE_SECONDS` | Segundos de caché HTTP de los GET de datos (por defecto 60; 0 = revalidar siempre). `/api/status` y `/api/health` nunca se cachean |
+| `HISTORY_MAX_ENTRIES` | Máximo de entradas del histórico (por defecto 500; las más antiguas se descartan) |
 | `REDIS_DB` | Base de datos de Redis (opcional). Con `REDIS_URL`: la de la URL o la 0; sin URL: prod 0, staging 1, resto 2 |
 | `REDIS_NAMESPACE` | Prefijo de claves; **cámbialo por edición** (p. ej. `bonos2026`) |
 | `MAIL_ENABLED` · `MAIL_TO` | Activar los avisos y destinatario(s), separados por comas |
@@ -154,7 +155,7 @@ Base: `http://localhost:12001`. CORS abierto; límite por defecto de 120 peticio
 | `GET` | `/api/status` | Healthcheck (incluye `PING` a Redis) |
 | `GET` | `/api/comercios` | Todos los comercios |
 | `GET` | `/api/comercios/status` | Entorno, total y fecha de la última actualización |
-| `GET` | `/api/comercios/history` | Histórico de altas y bajas (el más reciente primero) |
+| `GET` | `/api/comercios/history` | Histórico de altas y bajas (el más reciente primero; `?limit=N` para las N últimas) |
 | `GET` | `/api/comercios/sectors` | Sectores disponibles |
 | `GET` | `/api/comercios/filter?name=&sector=` | Comercios filtrados por nombre o sector |
 | `GET` | `/api/health` | Salud para monitores: 503 si Redis falla o los datos llevan demasiado sin actualizarse (15 min por defecto; se adapta a `SCRAPE_CRON`) |

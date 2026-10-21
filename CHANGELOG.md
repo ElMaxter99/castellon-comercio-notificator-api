@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.5.0 - 2026-10-21
+
+### Añadido
+- **Sin scrapeos solapados** (`src/utils/runGuard.js`): si ya hay un scrapeo en curso, el cron o `force-scrape` no lanzan otro (antes podían compararse ambos contra el mismo catálogo y duplicar el correo de altas). `force-scrape` responde **409** en ese caso.
+- **Cierre ordenado** ante `SIGTERM`/`SIGINT` (cada despliegue de Render/Docker): para el cron, espera hasta 10 s al scrapeo en curso, cierra el servidor HTTP y Redis; tope de 15 s.
+- **Caché HTTP**: `Cache-Control: public, max-age=60` (configurable con `CACHE_MAX_AGE_SECONDS`) en los GET de `/api/comercios/*`, con `ETag`; `/api/status` y `/api/health` van con `no-store`.
+- **Cabeceras de seguridad**: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`.
+- Tests: 57 (12 nuevos).
+
 ## v2.4.1 - 2026-10-21
 
 ### Corregido

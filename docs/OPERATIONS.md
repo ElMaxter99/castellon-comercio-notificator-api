@@ -15,6 +15,7 @@
 | `RATE_LIMIT_WINDOW_MS` | `60000` | Ventana del rate limit |
 | `RATE_LIMIT_MAX_REQUESTS` | `120` | Máx. peticiones por IP y ventana |
 | `REDIS_URL` | — | Si existe, ignora host/port/password |
+| `CACHE_MAX_AGE_SECONDS` | `60` | `Cache-Control: public, max-age=N` en los GET de `/api/comercios/*` (con `ETag`, tras caducar se revalida con 304). `0` → `no-cache`. `/api/status` y `/api/health`: `no-store` |
 | `REDIS_DB` | según entorno | Con `REDIS_URL`: la base de la URL o la 0 (los Redis gestionados solo tienen la 0); sin URL: prod 0, staging 1, resto 2 |
 | `REDIS_HOST` / `REDIS_PORT` | `redis` / `6379` | |
 | `REDIS_PASSWORD` | — | También lo usa `docker-compose` para `--requirepass` |

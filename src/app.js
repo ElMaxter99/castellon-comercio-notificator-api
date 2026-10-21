@@ -1,6 +1,6 @@
 const express = require("express");
 const comerciosRouter = require("./routes/comercios");
-const { startCron } = require("./cron");
+const { startCron, stopCron } = require("./cron");
 const { redis } = require("./config/redis");
 const { getLastUpdate } = require("./services/redisService");
 const { evaluateHealth } = require("./utils/health");
@@ -10,10 +10,13 @@ const requestLogger = require("./middleware/logger");
 const rateLimiter = require("./middleware/rateLimiter");
 const logger = require("./utils/logger");
 const { configureQueryParser } = require("./utils/expressSetup");
+const { securityHeaders, cacheControl } = require("./middleware/httpHeaders");
+const { createShutdown } = require("./utils/shutdown");
 
 const app = express();
 
 app.disable("x-powered-by");
+app.use(securityHeaders);
 configureQueryParser(app);
 
 // Detrás de un proxy inverso (Render, Nginx...) req.ip sería la IP del proxy y el
@@ -47,9 +50,12 @@ app.use(requestLogger);
 
 const port = process.env.PORT || 12001;
 
-app.use("/api/comercios", comerciosRouter);
+app.use("/api/comercios", cacheControl(), comerciosRouter);
 
-app.get("/api/status", async (req, res) => {
+app.get("/api/status", (req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+}, async (req, res) => {
   try {
     const redisStatus = await redis.ping();
     res.json({ ok: true, redis: redisStatus, message: "API running" });
@@ -68,7 +74,10 @@ app.get("/api/status", async (req, res) => {
 const SCHEDULE = getSchedule();
 const HEALTH_MAX_AGE_MINUTES = SCHEDULE.healthMaxAgeMinutes;
 
-app.get("/api/health", async (req, res) => {
+app.get("/api/health", (req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+}, async (req, res) => {
   try {
     const redisStatus = await redis.ping();
     const lastUpdate = await getLastUpdate();
@@ -93,7 +102,7 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
-app.listen(port, async () => {
+const server = app.listen(port, async () => {
   logger.success("API levantada", {
     context: "APP",
     meta: { port },
@@ -102,3 +111,18 @@ app.listen(port, async () => {
   logger.info("Iniciando cron de scrapeo", { context: "APP" });
   await startCron();
 });
+
+// Cierre ordenado: Render/Docker mandan SIGTERM en cada despliegue.
+const shutdown = createShutdown({
+  timeoutMs: 15000,
+  log: (message, err) =>
+    logger.info(message, { context: "APP", ...(err ? { meta: err } : {}) }),
+  steps: [
+    ["cron y scrapeo en curso", () => stopCron(10000)],
+    ["servidor HTTP", () => new Promise((resolve) => server.close(() => resolve()))],
+    ["Redis", () => redis.quit()],
+  ],
+});
+for (const signal of ["SIGTERM", "SIGINT"]) {
+  process.on(signal, () => shutdown(signal));
+}

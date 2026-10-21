@@ -73,6 +73,9 @@ router.get("/history", async (req, res) => {
 router.post("/force-scrape", requireAdminToken, async (req, res) => {
   try {
     const result = await runScrape(true);
+    if (result.skipped) {
+      return res.status(409).json({ ok: false, error: result.error });
+    }
     if (!result.ok) {
       return res.status(502).json({ ok: false, error: result.error });
     }

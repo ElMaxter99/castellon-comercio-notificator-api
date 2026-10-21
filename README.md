@@ -209,6 +209,18 @@ La documentación de la interfaz (ediciones, entornos, diseño) está en el [rep
 - Despliega tras HTTPS y revisa los logs; configura alertas de errores de Redis o de envío.
 - Usa un `REDIS_NAMESPACE` distinto en cada edición del programa.
 
+## 🔐 Privacidad y datos personales
+
+La API no tiene cuentas ni formularios: no recoge datos personales por sí misma. Lo único que guarda de cada visitante son datos técnicos de las peticiones, por seguridad y buen funcionamiento:
+
+| Dónde | Qué | Cuánto se conserva |
+|---|---|---|
+| `logs/access.log` | Fecha, método, URL, **IP** (`req.ip`, respeta `TRUST_PROXY`) | Rotación automática: 10 MB × 5 ficheros (≈ 50 MB). En Docker/Render no es un volumen: se pierde al recrear el contenedor |
+| Consola / logs del hosting | Lo anterior más el `User-Agent`, y la IP al superar el límite de peticiones | Según la retención del proveedor (p. ej. Render) |
+| Rate limiter | Contador por IP en memoria | Una ventana (60 s); se pierde al reiniciar |
+
+No se ceden a terceros ni se usan para identificar a nadie. Base jurídica: interés legítimo en la seguridad del servicio (art. 6.1.f RGPD). El texto que ve el usuario está en la página `/privacidad` del [front](https://github.com/ElMaxter99/castellon-comercio-notificator-front): **si cambias qué se registra, actualízalo también allí**.
+
 ## 🤝 Contribuir
 
 Abre un *issue* o una *pull request* desde una rama de `develop` (gitflow). Si tocas el scraper, pruébalo contra la web real: [`docs/SCRAPER.md`](docs/SCRAPER.md).

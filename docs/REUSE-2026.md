@@ -26,7 +26,7 @@ Ordenadas por valor:
 4. **Diff por clave estable** (nombre+dirección) y detectar modificaciones, no solo altas/bajas.
 5. ~~Timeouts/reintentos y HTTPS~~ Hecho (falta pausa entre páginas).
 6. **Notificar bajas** por email (la plantilla ya tiene `removedSection`, hoy siempre vacío).
-7. **Rotación real de logs** (usar `rotating-file-stream`, ya instalado) o quitar la dependencia.
+7. ~~Rotación real de logs~~ Hecho (`rotating-file-stream`, 10 MB × 5).
 8. **Tests** del scraper con un HTML fixture guardado y del `diff`.
 9. Acotar CORS al dominio del front y configurar `trust proxy` si hay proxy inverso.
 10. Limitar el tamaño del histórico o guardarlo en una lista de Redis en vez de un blob.

@@ -99,6 +99,6 @@ app.listen(port, async () => {
     meta: { port },
   });
   await verifyMailer();
-  logger.info("Iniciando cron de scrapeo cada 5 min", { context: "APP" });
+  logger.info("Iniciando cron de scrapeo", { context: "APP" });
   await startCron();
 });

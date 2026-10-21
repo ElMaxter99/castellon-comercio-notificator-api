@@ -1,5 +1,6 @@
 const Redis = require("ioredis");
 const logger = require("../utils/logger");
+const { resolveRedisDb } = require("../utils/redisDb");
 
 const {
   REDIS_URL,
@@ -25,7 +26,7 @@ logger.info("Conectando a Redis", {
 });
 
 const redis = new Redis(connectionUri, {
-  db: NODE_ENV === "prod" ? 0 : NODE_ENV === "staging" ? 1 : 2,
+  db: resolveRedisDb(process.env),
   retryStrategy: (times) => Math.min(times * 50, 2000),
 });
 

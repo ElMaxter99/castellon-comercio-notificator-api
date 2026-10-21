@@ -34,5 +34,9 @@ services:
         sync: false # URL pública del front (se usa en el email)
       - key: FORCE_SCRAPE_TOKEN
         sync: false # openssl rand -hex 32; sin él, POST /api/comercios/force-scrape está deshabilitado
+      - key: SCRAPE_CRON
+        value: "*/5 * * * *" # frecuencia del scrapeo (cron de 5 campos; mínimo 5 min). P. ej. "0 * * * *" = cada hora
+      - key: SCRAPER_USER_AGENT
+        sync: false # opcional; identificación del scraper (por defecto ComercioCastellonNotificator/<versión> (+web del proyecto))
       - key: RATE_LIMIT_MAX_REQUESTS
         value: "120"

@@ -6,7 +6,10 @@
 | `NODE_ENV` | `dev` | `prod`→Redis DB 0, `staging`→1, otro→2; prefijo de claves |
 | `PORT` | `12001` | Puerto HTTP |
 | `FORCE_SCRAPE_TOKEN` | — | Token de `POST /api/comercios/force-scrape` (`Authorization: Bearer`). Sin definir, la ruta está deshabilitada. Genera uno largo: `openssl rand -hex 32` |
-| `HEALTH_MAX_AGE_MINUTES` | `15` | Antigüedad máxima de los datos para que `/api/health` responda 200 |
+| `SCRAPER_USER_AGENT` | `ComercioCastellonNotificator/<versión> (+https://bono-castellon.alvaromaxter.es/; …)` | `User-Agent` del scraper. Vacío → el de por defecto; con caracteres no ASCII, saltos de línea o más de 300 caracteres se ignora (aviso `WARN [CRON]`). Conviene incluir un contacto |
+| `SCRAPE_CRON` | `*/5 * * * *` | Frecuencia del scrapeo: expresión cron de **5 campos**. Mínimo 5 min entre ejecuciones; una expresión inválida, con segundos o más frecuente se ignora y se usa la de por defecto (aviso `WARN [CRON]` en el arranque). Ejemplos: `*/15 * * * *`, `0 * * * *`, `0 8-22 * * *` |
+| `SCRAPE_CRON_TIMEZONE` | zona del servidor | Zona horaria IANA de `SCRAPE_CRON` (p. ej. `Europe/Madrid`; en Docker/Render el servidor va en UTC) |
+| `HEALTH_MAX_AGE_MINUTES` | deducida | Antigüedad máxima de los datos para que `/api/health` responda 200. Sin definir: 1,5 × el mayor hueco entre ejecuciones de `SCRAPE_CRON` (mínimo 15), así un cron horario no da falsas alarmas |
 | `GEO_CENTER_LAT` · `GEO_CENTER_LNG` · `GEO_RADIUS_KM` · `GEO_CITY` | Castelló · 30 km | Zona válida para las coordenadas de los comercios (ver `SCRAPER.md`) |
 | `TRUST_PROXY` | — | Nº de proxies inversos delante (Render = 1). Necesario para que el rate limit distinga IPs |
 | `RATE_LIMIT_WINDOW_MS` | `60000` | Ventana del rate limit |

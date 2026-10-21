@@ -3,7 +3,7 @@
 Guía para Claude Code. Léela entera antes de tocar nada.
 
 ## Qué es
-Backend Node.js/Express que **scrapea cada 5 min** el listado oficial de establecimientos adheridos al programa de bonos de Castelló de la Plana (`bonoscastellodelaplana.es`), lo guarda en **Redis**, calcula **altas/bajas** respecto a la ejecución anterior, guarda un **histórico** y **envía un email** cuando hay comercios nuevos. Expone todo por REST para el front (repo `castellon-comercio-notificator-front`).
+Backend Node.js/Express que **scrapea periódicamente** (por defecto cada 5 min, configurable con `SCRAPE_CRON`) el listado oficial de establecimientos adheridos al programa de bonos de Castelló de la Plana (`bonoscastellodelaplana.es`), lo guarda en **Redis**, calcula **altas/bajas** respecto a la ejecución anterior, guarda un **histórico** y **envía un email** cuando hay comercios nuevos. Expone todo por REST para el front (repo `castellon-comercio-notificator-front`).
 
 Proyecto independiente y sin ánimo de lucro; no tiene relación oficial con el Ayuntamiento.
 
@@ -11,7 +11,9 @@ Proyecto independiente y sin ánimo de lucro; no tiene relación oficial con el 
 | Fichero | Rol |
 |---|---|
 | `src/app.js` | Arranque Express: CORS `*`, rate limiter, logger HTTP, rutas, `/api/status`, verifica el correo y lanza el cron |
-| `src/cron.js` | `runScrape(manual)` + `startCron()` (`*/5 * * * *`) |
+| `src/cron.js` | `runScrape(manual)` + `startCron()` (frecuencia: `SCRAPE_CRON`, por defecto `*/5 * * * *`) |
+| `src/utils/userAgent.js` | Resuelve `SCRAPER_USER_AGENT` (por defecto un UA descriptivo con versión y web del proyecto; valores inválidos se ignoran con aviso) |
+| `src/utils/schedule.js` | Resuelve `SCRAPE_CRON`/`SCRAPE_CRON_TIMEZONE`: valida, mínimo 5 min, y deduce `HEALTH_MAX_AGE_MINUTES` y el periodo de gracia del arranque |
 | `src/scraper/index.js` | axios + cheerio, recorre la paginación de la web oficial. **Punto más frágil** |
 | `src/routes/comercios.js` | Endpoints `/api/comercios/*` |
 | `src/services/redisService.js` | Lectura/escritura en Redis (claves `ENV:NAMESPACE:nombre`) |
@@ -37,7 +39,7 @@ npm start                 # node src/app.js (necesita Redis accesible)
 docker compose up --build # API + Redis
 node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
 ```
-`npm test` ejecuta los tests (`node --test`, carpeta `test/`: geo, auth y salud). El **CI** (`.github/workflows/ci.yml`) corre en cada PR: tests + sintaxis, arranque real con Redis (`/api/status`, `/api/health`, 403 de `force-scrape`) y build de la imagen Docker. No hay linter ni build step.
+`npm test` ejecuta los tests (`node --test`, carpeta `test/`: geo, auth, salud, parser de query y frecuencia del cron). El **CI** (`.github/workflows/ci.yml`) corre en cada PR: tests + sintaxis, arranque real con Redis (`/api/status`, `/api/health`, 403 de `force-scrape`) y build de la imagen Docker. No hay linter ni build step.
 
 ## Convenciones
 - CommonJS (`require`), Node ≥ 22 (el Dockerfile usa `node:26.12.0-trixie-slim`; las dependencias exigen Node ≥ 20).

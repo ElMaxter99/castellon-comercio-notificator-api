@@ -1,5 +1,23 @@
 # Changelog
 
+## v2.4.0 - 2026-10-21
+
+### Añadido
+- **El scraper se identifica**: el `User-Agent` deja de ser `Mozilla/5.0` y pasa a ser configurable con `SCRAPER_USER_AGENT`. Por defecto: `ComercioCastellonNotificator/<versión> (+https://bono-castellon.alvaromaxter.es/; proyecto independiente sin ánimo de lucro)`, de modo que la web oficial sabe quién consulta y puede contactar. Un valor inválido (no ASCII, saltos de línea, >300 caracteres) se ignora con aviso. Se registra al arrancar. Comprobado: la web oficial responde igual (200) con el nuevo valor. Tests: 40 (4 nuevos).
+
+## v2.3.0 - 2026-10-21
+
+### Añadido
+- **Frecuencia del scrapeo configurable** con `SCRAPE_CRON` (expresión cron de 5 campos; por defecto `*/5 * * * *`, igual que antes) y `SCRAPE_CRON_TIMEZONE` (zona IANA opcional). Se valida en el arranque (`src/utils/schedule.js`): una expresión inválida, con segundos, que casi nunca se ejecute o más seguida que cada **5 minutos** se ignora con un aviso `WARN [CRON]` y se usa la de por defecto (así no se castiga la web oficial por un error de configuración).
+- **`/api/health` se adapta a la frecuencia**: si no se define `HEALTH_MAX_AGE_MINUTES`, la antigüedad máxima se deduce como 1,5 × el mayor hueco entre ejecuciones (mínimo 15 min) y el periodo de gracia tras arrancar se alarga igual. Con un cron horario ya no hay falsos 503. `HEALTH_MAX_AGE_MINUTES` explícito sigue mandando.
+- `render.yaml`, `.env.example`, README y `docs/` actualizados. Tests: 36 (14 nuevos).
+
+## v2.2.3 - 2026-10-21
+
+### Corregido
+- `.gitignore`: en la v2.2.1 se añadió `logs/` sin salto de línea y quedó pegado a la línea anterior (`package-lock.jsonlogs/`), con lo que **ni `package-lock.json` ni `logs/` se ignoraban**. Se restauran las dos líneas.
+- Se **deja de versionar `package-lock.json`** (1 417 líneas que se colaron en esa misma versión; el repo no lo versiona a propósito, ver `CLAUDE.md`).
+
 ## v2.2.2 - 2026-10-21
 
 ### Docs

@@ -10,6 +10,8 @@ const {
 const { diffComercios } = require("./utils/diff");
 const { sendDiffEmail } = require("./services/mailService");
 const cron = require("node-cron");
+const { getSchedule } = require("./utils/schedule");
+const { getUserAgent } = require("./utils/userAgent");
 
 async function runScrape(manual = false) {
   logger.info(manual ? "Scrapeo manual iniciado" : "Ejecutando scrapeo automático", {
@@ -90,8 +92,31 @@ async function runScrape(manual = false) {
 }
 
 async function startCron() {
-  logger.info("Cron programado cada 5 minutos", { context: "CRON" });
-  cron.schedule("*/5 * * * *", () => runScrape(false));
+  const userAgent = getUserAgent();
+  for (const warning of userAgent.warnings) {
+    logger.warn(warning, { context: "CRON" });
+  }
+  logger.info(`User-Agent del scraper: ${userAgent.value}`, { context: "CRON" });
+  const schedule = getSchedule();
+  for (const warning of schedule.warnings) {
+    logger.warn(warning, { context: "CRON" });
+  }
+  logger.info(
+    `Cron programado: "${schedule.expression}"${schedule.timezone ? ` (${schedule.timezone})` : ""}`,
+    {
+      context: "CRON",
+      meta: {
+        minIntervaloMin: schedule.minGapMinutes,
+        maxIntervaloMin: schedule.maxGapMinutes,
+        saludMaxMin: schedule.healthMaxAgeMinutes,
+      },
+    }
+  );
+  cron.schedule(
+    schedule.expression,
+    () => runScrape(false),
+    schedule.timezone ? { timezone: schedule.timezone } : undefined
+  );
 
   // Con Redis vacío (primer arranque o namespace nuevo) no se espera al primer tick.
   const actuales = await getComercios();

@@ -30,4 +30,4 @@ Ordenadas por valor:
 8. **Tests** del scraper con un HTML fixture guardado y del `diff`.
 9. Acotar CORS al dominio del front y configurar `trust proxy` si hay proxy inverso.
 10. Limitar el tamaño del histórico o guardarlo en una lista de Redis en vez de un blob.
-11. Si el programa 2026 es un listado que no cambia, el cron de 5 min puede reducirse (p. ej. cada hora) para ser amable con el servidor origen.
+11. ~~Reducir el cron~~ Hecho: la frecuencia se configura con `SCRAPE_CRON` (p. ej. `0 * * * *`, cada hora) para ser amable con el servidor origen; la salud (`/api/health`) se adapta sola.

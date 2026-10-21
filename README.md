@@ -35,7 +35,7 @@ Este repositorio es **solo el backend**. La interfaz está en el [**front**](htt
 
 ```mermaid
 flowchart LR
-    W["🌐 Web oficial<br/>bonoscastellodelaplana.es"] -- "scrapeo cada 5 min" --> A["⚙️ API<br/>Node · Express (este repo)"]
+    W["🌐 Web oficial<br/>bonoscastellodelaplana.es"] -- "scrapeo periódico (SCRAPE_CRON)" --> A["⚙️ API<br/>Node · Express (este repo)"]
     A <--> R[("🧠 Redis")]
     A -- "email si hay<br/>comercios nuevos" --> M["✉️ SMTP / Resend"]
     A -- "REST /api/comercios" --> F["🖥️ Front<br/>Angular"]
@@ -53,7 +53,7 @@ flowchart LR
 
 ## ✨ Qué hace
 
-- 🔁 **Scrapea** el listado oficial (axios + cheerio) cada 5 minutos y recorre todas las páginas.
+- 🔁 **Scrapea** el listado oficial (axios + cheerio) y recorre todas las páginas. Por defecto cada 5 minutos; la frecuencia se configura con `SCRAPE_CRON`.
 - 💾 **Guarda en Redis** el catálogo, los sectores, la fecha del último scrapeo y el **histórico** de altas y bajas.
 - ✉️ **Avisa por correo** cuando aparecen comercios nuevos, con **SMTP tradicional o [Resend](https://resend.com)**.
 - 📦 **Expone una API REST** para el front: listado, estado, histórico, sectores y filtro.
@@ -136,7 +136,9 @@ Copia [`.env.example`](.env.example). Las variables principales:
 | `RESEND_API_KEY` · `MAIL_FROM` | Solo Resend (el remitente debe ser de un dominio verificado) |
 | `FRONTEND_URL` | Enlace que aparece en el correo |
 | `FORCE_SCRAPE_TOKEN` | Token de `force-scrape` (sin definir, la ruta está deshabilitada) |
-| `HEALTH_MAX_AGE_MINUTES` | Antigüedad máxima de los datos para `/api/health` (15) |
+| `SCRAPE_CRON` · `SCRAPE_CRON_TIMEZONE` | Frecuencia del scrapeo como expresión cron de 5 campos (por defecto `*/5 * * * *`; mínimo 5 min) y su zona horaria |
+| `SCRAPER_USER_AGENT` | `User-Agent` con el que el scraper se identifica ante la web oficial (por defecto `ComercioCastellonNotificator/<versión> (+web del proyecto)`; solo ASCII, máx. 300) |
+| `HEALTH_MAX_AGE_MINUTES` | Antigüedad máxima de los datos para `/api/health` (por defecto 15 o la deducida de `SCRAPE_CRON`) |
 | `TRUST_PROXY` · `RATE_LIMIT_*` | Proxy inverso (Render = 1) y límite de peticiones por IP |
 
 Todas, con su valor por defecto, en [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
@@ -153,7 +155,7 @@ Base: `http://localhost:12001`. CORS abierto; límite por defecto de 120 peticio
 | `GET` | `/api/comercios/history` | Histórico de altas y bajas (el más reciente primero) |
 | `GET` | `/api/comercios/sectors` | Sectores disponibles |
 | `GET` | `/api/comercios/filter?name=&sector=` | Comercios filtrados por nombre o sector |
-| `GET` | `/api/health` | Salud para monitores: 503 si Redis falla o los datos llevan >15 min sin actualizarse |
+| `GET` | `/api/health` | Salud para monitores: 503 si Redis falla o los datos llevan demasiado sin actualizarse (15 min por defecto; se adapta a `SCRAPE_CRON`) |
 | `POST` | `/api/comercios/force-scrape` 🔒 | Fuerza un scrapeo ahora (requiere `Authorization: Bearer $FORCE_SCRAPE_TOKEN`) |
 
 Ejemplo de comercio (datos ficticios):
@@ -176,7 +178,7 @@ Ejemplo de comercio (datos ficticios):
 ```
 src/
 ├── app.js                  Express: CORS, rate limit, logs, rutas y arranque del cron
-├── cron.js                 runScrape() + programación (*/5 * * * *)
+├── cron.js                 runScrape() + programación (SCRAPE_CRON, por defecto */5 * * * *)
 ├── scraper/                descarga y parseo de la web oficial
 ├── routes/comercios.js     endpoints REST
 ├── services/               Redis, correo (SMTP / Resend) y plantillas

@@ -31,7 +31,7 @@ Todos los comercios guardados (`[]` si Redis está vacío).
 `lastUpdate` es `null` si nunca se ha scrapeado. (El front asume string; ver docs del front.)
 
 ## `GET /api/comercios/history`
-Más reciente primero. Solo nombres, no objetos completos.
+Más reciente primero. Solo nombres, no objetos completos. `?limit=N` devuelve solo las N últimas (entero ≥ 1; otro valor se ignora). El histórico guarda como máximo `HISTORY_MAX_ENTRIES` entradas (500 por defecto): las más antiguas se descartan al añadir.
 ```json
 [{ "timestamp": "2025-11-03T14:55:22.000Z", "added": ["Librería Roma"], "removed": ["Bar Pepe"], "countAfter": 248 }]
 ```

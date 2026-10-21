@@ -45,7 +45,7 @@ Consecuencias del diff por nombre: si un comercio cambia teléfono/dirección/im
 |---|---|
 | `comercios` | JSON array `[{ name, sector, phone, address, img, mapsUrl }]` |
 | `last-update` | ISO string del último scrapeo terminado sin excepción |
-| `history` | JSON array, **más reciente primero**: `{ timestamp, added: string[], removed: string[], countAfter }` (solo nombres) |
+| `history` | JSON array, **más reciente primero**: `{ timestamp, added: string[], removed: string[], countAfter }` (solo nombres); acotado a `HISTORY_MAX_ENTRIES` (500) |
 | `sectors` | JSON array de sectores únicos (`"Sin sector"` si vacío) |
 
 Todo se guarda como un único blob JSON por clave (sin TTL). El histórico crece sin límite y se reescribe entero en cada cambio.

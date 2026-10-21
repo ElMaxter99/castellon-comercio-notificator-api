@@ -57,7 +57,7 @@ curl -X POST -H "Authorization: Bearer $FORCE_SCRAPE_TOKEN" https://TU-API/api/c
 | `FORCE_SCRAPE_TOKEN` sin definir | 403 | `{ "ok": false, "error": "Ruta deshabilitada: ..." }` |
 
 ## `GET /api/health`
-Salud para **monitores externos** (UptimeRobot, etc.). Devuelve `503` si Redis falla o si los datos llevan más de `HEALTH_MAX_AGE_MINUTES` (15 por defecto) sin actualizarse, es decir, si el cron no está corriendo o el scrapeo no se completa. Tras un arranque hay 6 minutos de gracia (el cron tarda hasta 5 min en su primer tick).
+Salud para **monitores externos** (UptimeRobot, etc.). Devuelve `503` si Redis falla o si los datos llevan más de `HEALTH_MAX_AGE_MINUTES` (15 por defecto; si cambias `SCRAPE_CRON`, se deduce de la frecuencia) sin actualizarse, es decir, si el cron no está corriendo o el scrapeo no se completa. Tras un arranque hay 6 minutos de gracia (el cron tarda hasta 5 min en su primer tick).
 ```json
 { "ok": true, "redis": "PONG", "lastUpdate": "2026-10-20T13:50:03.781Z", "ageMinutes": 1.2, "maxAgeMinutes": 15 }
 ```

@@ -54,7 +54,7 @@ Todo se guarda como un único blob JSON por clave (sin TTL). El histórico crece
 Orden de middlewares: `x-powered-by` off → `express.json()` → CORS manual (`Access-Control-Allow-Origin: *`, preflight 204) → `rateLimiter` → `requestLogger` → rutas.
 - `GET /api/status`: healthcheck (hace `redis.ping()`).
 - `/api/comercios/*`: ver [API.md](API.md).
-- Al hacer `listen`: `verifyMailer()` y luego `startCron()`. `startCron()` programa el cron y, si Redis no tiene comercios, lanza un scrapeo inicial inmediato (si ya hay datos espera al siguiente múltiplo de 5 min).
+- Al hacer `listen`: `verifyMailer()` y luego `startCron()`. `startCron()` programa el cron según `SCRAPE_CRON` (`utils/schedule.js`: valida la expresión, impone ≥ 5 min entre ejecuciones y deduce la antigüedad máxima para `/api/health`) y, si Redis no tiene comercios, lanza un scrapeo inicial inmediato (si ya hay datos espera al siguiente múltiplo de 5 min).
 
 ## Middlewares
 - **rateLimiter**: ventana fija por IP en un `Map` en memoria. `RATE_LIMIT_WINDOW_MS` (60000) y `RATE_LIMIT_MAX_REQUESTS` (120). Devuelve 429. Usa `req.ip`; detrás de un proxy inverso sin `trust proxy` todas las peticiones compartirán IP.

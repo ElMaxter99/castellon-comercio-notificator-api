@@ -4,6 +4,7 @@ const { startCron } = require("./cron");
 const { redis } = require("./config/redis");
 const { getLastUpdate } = require("./services/redisService");
 const { evaluateHealth } = require("./utils/health");
+const { getSchedule } = require("./utils/schedule");
 const { verifyMailer } = require("./services/mailService");
 const requestLogger = require("./middleware/logger");
 const rateLimiter = require("./middleware/rateLimiter");
@@ -63,7 +64,9 @@ app.get("/api/status", async (req, res) => {
 
 // Salud para monitores externos (UptimeRobot, etc.): 503 si Redis falla o si los datos
 // llevan demasiado tiempo sin actualizarse (el cron no está corriendo o el scrapeo falla).
-const HEALTH_MAX_AGE_MINUTES = Number(process.env.HEALTH_MAX_AGE_MINUTES || 15);
+// Antigüedad máxima de los datos: HEALTH_MAX_AGE_MINUTES o, si no se define, la deducida de SCRAPE_CRON
+const SCHEDULE = getSchedule();
+const HEALTH_MAX_AGE_MINUTES = SCHEDULE.healthMaxAgeMinutes;
 
 app.get("/api/health", async (req, res) => {
   try {
@@ -73,6 +76,7 @@ app.get("/api/health", async (req, res) => {
       lastUpdate,
       uptimeSeconds: process.uptime(),
       maxAgeMinutes: HEALTH_MAX_AGE_MINUTES,
+      startupGraceSeconds: SCHEDULE.startupGraceSeconds,
     });
 
     res.status(health.ok ? 200 : 503).json({

@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2.3 - 2026-10-21
+
+### Corregido
+- `.gitignore`: en la v2.2.1 se añadió `logs/` sin salto de línea y quedó pegado a la línea anterior (`package-lock.jsonlogs/`), con lo que **ni `package-lock.json` ni `logs/` se ignoraban**. Se restauran las dos líneas.
+- Se **deja de versionar `package-lock.json`** (1 417 líneas que se colaron en esa misma versión; el repo no lo versiona a propósito, ver `CLAUDE.md`).
+
 ## v2.2.2 - 2026-10-21
 
 ### Docs

@@ -1,6 +1,6 @@
 {
   "name": "bonoscastello-api",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",

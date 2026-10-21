@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.6.0 - 2026-10-21
+
+### Añadido
+- **Tests del scraper** (`test/scraper.test.js` + `test/fixtures/`): extracción de campos, limpieza de dirección, enlaces a https, paginación, última página, página sin tarjetas (la web cambió), bucle de paginación y User-Agent. Si la web oficial cambia su HTML, el fallo se ve en CI.
+
+### Cambiado
+- **El diff de altas/bajas distingue comercios homónimos** (`src/utils/diff.js`): compara por nombre normalizado (sin mayúsculas, acentos ni espacios repetidos) y, si un nombre se repite, por recuento usando la dirección para saber cuál es el alta o la baja. Antes un segundo comercio con el mismo nombre se perdía. Corregir solo la dirección de un comercio **no** genera alta ni baja (evita correos falsos). Con el catálogo actual (121 comercios, sin nombres repetidos) el resultado es idéntico al anterior.
+- Tests: 71 (14 nuevos).
+
 ## v2.5.0 - 2026-10-21
 
 ### Añadido

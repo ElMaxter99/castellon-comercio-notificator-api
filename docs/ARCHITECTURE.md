@@ -23,13 +23,13 @@ Consumir mejor el listado de establecimientos adheridos al programa de bonos de 
 ## Flujo de `runScrape(manual)` (`src/cron.js`)
 1. `scrapeComercios()` → lista nueva (todas las páginas).
 2. `getComercios()` → lista guardada. **Si la lista nueva está vacía se aborta** (error en log, Redis intacto).
-3. `diffComercios(antiguos, nuevos)` compara **por `name`** (`Set` de nombres).
+3. `diffComercios(antiguos, nuevos)` compara **por nombre** (sin mayúsculas, acentos ni espacios repetidos). Con nombres repetidos cuenta cuántos hay y usa la dirección solo para decidir cuál es el alta o la baja.
 4. Si hay altas o bajas: `saveComercios(nuevos)`, `addHistoryEntry`, `updateSectorsFromComercios`.
 5. Si hay altas y ya había catálogo: `sendDiffEmail({ added, removed })` (el email solo lista altas). En la **carga inicial** (catálogo previo vacío) no se envía correo.
 6. Siempre al final: `saveLastUpdate()`.
 7. Cualquier excepción se loguea y se traga (el cron no muere).
 
-Consecuencias del diff por nombre: si un comercio cambia teléfono/dirección/imagen pero no nombre, **no se detecta ni se guarda** el cambio. Dos comercios con el mismo nombre (sucursales) se colapsan en el diff.
+Consecuencias del diff por nombre: si un comercio cambia teléfono/dirección/imagen pero no nombre, **no se detecta ni se guarda** el cambio. Dos comercios con el mismo nombre (sucursales) sí se distinguen (por recuento + dirección); corregir solo la dirección no genera alta ni baja.
 
 ## Saneado, administración y salud
 - `utils/geo.js` limpia coordenadas atípicas tras el scrapeo (ver [SCRAPER.md](SCRAPER.md)).

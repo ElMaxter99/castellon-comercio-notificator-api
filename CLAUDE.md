@@ -14,6 +14,7 @@ Proyecto independiente y sin ánimo de lucro; no tiene relación oficial con el 
 | `src/cron.js` | `runScrape(manual)` + `startCron()` (frecuencia: `SCRAPE_CRON`, por defecto `*/5 * * * *`) |
 | `src/utils/userAgent.js` | Resuelve `SCRAPER_USER_AGENT` (por defecto un UA descriptivo con versión y web del proyecto; valores inválidos se ignoran con aviso) |
 | `src/utils/schedule.js` | Resuelve `SCRAPE_CRON`/`SCRAPE_CRON_TIMEZONE`: valida, mínimo 5 min, y deduce `HEALTH_MAX_AGE_MINUTES` y el periodo de gracia del arranque |
+| `src/utils/runGuard.js` · `src/utils/shutdown.js` · `src/middleware/httpHeaders.js` | Candado anti-solape del scrapeo, cierre ordenado ante SIGTERM/SIGINT y cabeceras (seguridad + `Cache-Control`) |
 | `src/scraper/index.js` | axios + cheerio, recorre la paginación de la web oficial. **Punto más frágil** |
 | `src/routes/comercios.js` | Endpoints `/api/comercios/*` |
 | `src/services/redisService.js` | Lectura/escritura en Redis (claves `ENV:NAMESPACE:nombre`) |

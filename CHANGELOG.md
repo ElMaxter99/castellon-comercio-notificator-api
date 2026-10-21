@@ -1,5 +1,23 @@
 # Changelog
 
+## v2.6.0 - 2026-10-21
+
+### Añadido
+- **Tests del scraper** (`test/scraper.test.js` + `test/fixtures/`): extracción de campos, limpieza de dirección, enlaces a https, paginación, última página, página sin tarjetas (la web cambió), bucle de paginación y User-Agent. Si la web oficial cambia su HTML, el fallo se ve en CI.
+
+### Cambiado
+- **El diff de altas/bajas distingue comercios homónimos** (`src/utils/diff.js`): compara por nombre normalizado (sin mayúsculas, acentos ni espacios repetidos) y, si un nombre se repite, por recuento usando la dirección para saber cuál es el alta o la baja. Antes un segundo comercio con el mismo nombre se perdía. Corregir solo la dirección de un comercio **no** genera alta ni baja (evita correos falsos). Con el catálogo actual (121 comercios, sin nombres repetidos) el resultado es idéntico al anterior.
+- Tests: 71 (14 nuevos).
+
+## v2.5.0 - 2026-10-21
+
+### Añadido
+- **Sin scrapeos solapados** (`src/utils/runGuard.js`): si ya hay un scrapeo en curso, el cron o `force-scrape` no lanzan otro (antes podían compararse ambos contra el mismo catálogo y duplicar el correo de altas). `force-scrape` responde **409** en ese caso.
+- **Cierre ordenado** ante `SIGTERM`/`SIGINT` (cada despliegue de Render/Docker): para el cron, espera hasta 10 s al scrapeo en curso, cierra el servidor HTTP y Redis; tope de 15 s.
+- **Caché HTTP**: `Cache-Control: public, max-age=60` (configurable con `CACHE_MAX_AGE_SECONDS`) en los GET de `/api/comercios/*`, con `ETag`; `/api/status` y `/api/health` van con `no-store`.
+- **Cabeceras de seguridad**: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`.
+- Tests: 57 (12 nuevos).
+
 ## v2.4.1 - 2026-10-21
 
 ### Corregido

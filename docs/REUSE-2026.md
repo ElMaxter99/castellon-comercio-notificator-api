@@ -23,7 +23,7 @@ Ordenadas por valor:
 1. ~~Guarda contra scrapeo vacío~~ Hecho (solo cubre 0 comercios; se podría ampliar a caídas >50%).
 2. ~~Proteger `force-scrape`~~ Hecho (`FORCE_SCRAPE_TOKEN`; sin él la ruta está deshabilitada).
 3. ~~Scrapeo inicial al arrancar~~ Hecho.
-4. **Diff por clave estable** (nombre+dirección) y detectar modificaciones, no solo altas/bajas.
+4. Detectar **modificaciones** de un comercio (teléfono, dirección…), no solo altas/bajas (el diff ya distingue homónimos por recuento + dirección).
 5. ~~Timeouts/reintentos y HTTPS~~ Hecho (falta pausa entre páginas).
 6. **Notificar bajas** por email (la plantilla ya tiene `removedSection`, hoy siempre vacío).
 7. ~~Rotación real de logs~~ Hecho (`rotating-file-stream`, 10 MB × 5).

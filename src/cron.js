@@ -12,8 +12,28 @@ const { sendDiffEmail } = require("./services/mailService");
 const cron = require("node-cron");
 const { getSchedule } = require("./utils/schedule");
 const { getUserAgent } = require("./utils/userAgent");
+const { createRunGuard } = require("./utils/runGuard");
 
+const scrapeGuard = createRunGuard();
+let cronTask = null;
+
+/**
+ * Ejecuta un scrapeo si no hay otro en curso (cron + force-scrape no se solapan).
+ * Si ya hay uno, devuelve `{ ok: false, skipped: true }`.
+ */
 async function runScrape(manual = false) {
+  const outcome = await scrapeGuard.run(() => doScrape(manual));
+  if (outcome.skipped) {
+    logger.warn("Ya hay un scrapeo en curso; se omite esta ejecución", {
+      context: "CRON",
+      meta: { manual },
+    });
+    return { ok: false, skipped: true, error: "Ya hay un scrapeo en curso" };
+  }
+  return outcome.value;
+}
+
+async function doScrape(manual) {
   logger.info(manual ? "Scrapeo manual iniciado" : "Ejecutando scrapeo automático", {
     context: "CRON",
     meta: { manual },
@@ -112,7 +132,7 @@ async function startCron() {
       },
     }
   );
-  cron.schedule(
+  cronTask = cron.schedule(
     schedule.expression,
     () => runScrape(false),
     schedule.timezone ? { timezone: schedule.timezone } : undefined
@@ -126,4 +146,13 @@ async function startCron() {
   }
 }
 
-module.exports = { runScrape, startCron };
+/** Para el cron y espera (hasta `timeoutMs`) a que termine el scrapeo en curso. */
+async function stopCron(timeoutMs = 10000) {
+  if (cronTask) {
+    cronTask.stop();
+    cronTask = null;
+  }
+  return scrapeGuard.whenIdle(timeoutMs);
+}
+
+module.exports = { runScrape, startCron, stopCron };

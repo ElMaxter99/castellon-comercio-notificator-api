@@ -30,6 +30,7 @@ La web oficial geocodifica mal a algunos comercios (p. ej. una avenida de Castel
 Los casos corregidos y excluidos se registran en un `WARN` `[SCRAPER]` con su distancia. Con los datos del 20-oct-2026: 3 corregidos y 1 excluido de 71.
 
 ## Cómo repararlo si la web cambia
+1. Los tests (`test/scraper.test.js`) usan HTML de ejemplo en `test/fixtures/`: si la web cambia, actualiza esos ficheros con la estructura nueva y ajusta los selectores hasta que pasen.
 1. Descargar una página real: `curl -s -A "ComercioCastellonNotificator/dev" "<URL>" > /tmp/page.html` y abrirla.
 2. Localizar el contenedor repetido de cada comercio y actualizar el selector de `$(".col-...")`.
 3. Actualizar los selectores de campo y la lógica del enlace "Siguiente".

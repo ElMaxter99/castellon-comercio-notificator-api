@@ -52,6 +52,7 @@ curl -X POST -H "Authorization: Bearer $FORCE_SCRAPE_TOKEN" https://TU-API/api/c
 | Resultado | HTTP | Cuerpo |
 |---|---|---|
 | Scrapeo correcto | 200 | `{ "ok": true, "changed": false, "total": 70, "added": 0, "removed": 0, "message": "Scrapeo manual completado." }` |
+| Ya hay un scrapeo en curso (cron u otra llamada) | 409 | `{ "ok": false, "error": "Ya hay un scrapeo en curso" }` |
 | El scrapeo falla o devuelve 0 comercios | 502 | `{ "ok": false, "error": "..." }` (el catálogo anterior se conserva) |
 | Token ausente o incorrecto | 401 | `{ "ok": false, "error": "Token inválido o ausente." }` |
 | `FORCE_SCRAPE_TOKEN` sin definir | 403 | `{ "ok": false, "error": "Ruta deshabilitada: ..." }` |

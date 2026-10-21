@@ -129,6 +129,7 @@ Copia [`.env.example`](.env.example). Las variables principales:
 |---|---|
 | `NODE_ENV` · `PORT` | Entorno (`prod` → Redis DB 0) y puerto (por defecto 12001) |
 | `REDIS_URL` *(o `REDIS_HOST`/`PORT`/`PASSWORD`)* | Conexión a Redis (`rediss://` en servicios con TLS) |
+| `CACHE_MAX_AGE_SECONDS` | Segundos de caché HTTP de los GET de datos (por defecto 60; 0 = revalidar siempre). `/api/status` y `/api/health` nunca se cachean |
 | `REDIS_DB` | Base de datos de Redis (opcional). Con `REDIS_URL`: la de la URL o la 0; sin URL: prod 0, staging 1, resto 2 |
 | `REDIS_NAMESPACE` | Prefijo de claves; **cámbialo por edición** (p. ej. `bonos2026`) |
 | `MAIL_ENABLED` · `MAIL_TO` | Activar los avisos y destinatario(s), separados por comas |

@@ -12,6 +12,7 @@ Proyecto independiente y sin ánimo de lucro; no tiene relación oficial con el 
 |---|---|
 | `src/app.js` | Arranque Express: CORS `*`, rate limiter, logger HTTP, rutas, `/api/status`, verifica el correo y lanza el cron |
 | `src/cron.js` | `runScrape(manual)` + `startCron()` (frecuencia: `SCRAPE_CRON`, por defecto `*/5 * * * *`) |
+| `src/utils/userAgent.js` | Resuelve `SCRAPER_USER_AGENT` (por defecto un UA descriptivo con versión y web del proyecto; valores inválidos se ignoran con aviso) |
 | `src/utils/schedule.js` | Resuelve `SCRAPE_CRON`/`SCRAPE_CRON_TIMEZONE`: valida, mínimo 5 min, y deduce `HEALTH_MAX_AGE_MINUTES` y el periodo de gracia del arranque |
 | `src/scraper/index.js` | axios + cheerio, recorre la paginación de la web oficial. **Punto más frágil** |
 | `src/routes/comercios.js` | Endpoints `/api/comercios/*` |

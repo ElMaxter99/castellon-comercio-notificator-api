@@ -137,6 +137,7 @@ Copia [`.env.example`](.env.example). Las variables principales:
 | `FRONTEND_URL` | Enlace que aparece en el correo |
 | `FORCE_SCRAPE_TOKEN` | Token de `force-scrape` (sin definir, la ruta está deshabilitada) |
 | `SCRAPE_CRON` · `SCRAPE_CRON_TIMEZONE` | Frecuencia del scrapeo como expresión cron de 5 campos (por defecto `*/5 * * * *`; mínimo 5 min) y su zona horaria |
+| `SCRAPER_USER_AGENT` | `User-Agent` con el que el scraper se identifica ante la web oficial (por defecto `ComercioCastellonNotificator/<versión> (+web del proyecto)`; solo ASCII, máx. 300) |
 | `HEALTH_MAX_AGE_MINUTES` | Antigüedad máxima de los datos para `/api/health` (por defecto 15 o la deducida de `SCRAPE_CRON`) |
 | `TRUST_PROXY` · `RATE_LIMIT_*` | Proxy inverso (Render = 1) y límite de peticiones por IP |
 

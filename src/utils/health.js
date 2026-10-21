@@ -5,9 +5,15 @@ const STARTUP_GRACE_SECONDS = 6 * 60; // tras arrancar, el cron tarda hasta 5 mi
  * Es "obsoleto" si el último scrapeo completado es más antiguo que `maxAgeMinutes`
  * (o no existe), salvo durante el periodo de gracia posterior al arranque.
  */
-function evaluateHealth({ lastUpdate, now = Date.now(), uptimeSeconds, maxAgeMinutes }) {
+function evaluateHealth({
+  lastUpdate,
+  now = Date.now(),
+  uptimeSeconds,
+  maxAgeMinutes,
+  startupGraceSeconds = STARTUP_GRACE_SECONDS,
+}) {
   const ageMinutes = lastUpdate ? (now - lastUpdate.getTime()) / 60000 : null;
-  const inGrace = uptimeSeconds < STARTUP_GRACE_SECONDS;
+  const inGrace = uptimeSeconds < startupGraceSeconds;
   const stale = !inGrace && (ageMinutes === null || ageMinutes > maxAgeMinutes);
   return {
     ok: !stale,

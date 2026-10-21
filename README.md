@@ -129,6 +129,7 @@ Copia [`.env.example`](.env.example). Las variables principales:
 |---|---|
 | `NODE_ENV` · `PORT` | Entorno (`prod` → Redis DB 0) y puerto (por defecto 12001) |
 | `REDIS_URL` *(o `REDIS_HOST`/`PORT`/`PASSWORD`)* | Conexión a Redis (`rediss://` en servicios con TLS) |
+| `REDIS_DB` | Base de datos de Redis (opcional). Con `REDIS_URL`: la de la URL o la 0; sin URL: prod 0, staging 1, resto 2 |
 | `REDIS_NAMESPACE` | Prefijo de claves; **cámbialo por edición** (p. ej. `bonos2026`) |
 | `MAIL_ENABLED` · `MAIL_TO` | Activar los avisos y destinatario(s), separados por comas |
 | `MAIL_PROVIDER` | `smtp` (por defecto) o `resend` (API HTTPS, necesario en hosts que bloquean SMTP) |

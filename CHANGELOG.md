@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.4.1 - 2026-10-21
+
+### Corregido
+- **`ERR DB index is out of range` en Render/Upstash**: con `NODE_ENV=production` la API pedía la base 2 (`SELECT 2`), que los Redis gestionados no tienen. Ahora, con `REDIS_URL`, usa la base 0 (o la de la URL); nueva variable opcional `REDIS_DB`. Sin `REDIS_URL` (Docker local) el mapeo no cambia. Las claves siguen siendo las mismas (`production:bonos:*`), no hay que migrar datos.
+- El log de arranque ya no dice «cada 5 min» fijo (el detalle lo da `Cron programado: …`).
+
 ## v2.4.0 - 2026-10-21
 
 ### Añadido

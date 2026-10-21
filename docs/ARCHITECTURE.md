@@ -58,7 +58,7 @@ Orden de middlewares: `x-powered-by` off → `express.json()` → CORS manual (`
 
 ## Middlewares
 - **rateLimiter**: ventana fija por IP en un `Map` en memoria. `RATE_LIMIT_WINDOW_MS` (60000) y `RATE_LIMIT_MAX_REQUESTS` (120). Devuelve 429. Usa `req.ip`; detrás de un proxy inverso sin `trust proxy` todas las peticiones compartirán IP.
-- **logger (HTTP)**: escribe en consola y en `logs/access.log` (se crea en `logs/`). La dependencia `rotating-file-stream` está instalada pero **no se usa** (el README dice "rotativo", en realidad es un append simple).
+- **logger (HTTP)**: escribe en consola y en `logs/access.log` (se crea en `logs/`, ignorado por git) con rotación de `rotating-file-stream` (10 MB × 5 ficheros). La IP sale de `req.ip` (respeta `TRUST_PROXY`), no de `X-Forwarded-For` en crudo.
 
 ## Email
 - `mailService.js` elige el proveedor con `MAIL_PROVIDER` (`smtp` por defecto, `resend`; un valor desconocido avisa y usa `smtp`). `MAIL_ENABLED !== "true"` desactiva envío y verificación.
@@ -69,7 +69,7 @@ Orden de middlewares: `x-powered-by` off → `express.json()` → CORS manual (`
 - `templateService.js`: agrupa altas por sector, escapa todo con `escapeHtml`, sustituye `{{date}}`, `{{totalChanges}}`, `{{addedSection}}`, `{{removedSection}}`, `{{noChangesMessage}}`, `{{frontendUrl}}` en `src/templates/updateEmail.html`. Para añadir otra plantilla: nueva entrada en `src/enums/mailTemplates.js` + `case` en `getTemplateHtml`.
 
 ## Dependencias clave
-express 5, axios, cheerio 1.0.0-rc, ioredis 6, node-cron 4, nodemailer 10, rotating-file-stream (sin uso).
+express 5, axios, cheerio 1.0.0-rc, ioredis 6, node-cron 4, nodemailer 10, rotating-file-stream.
 
 ## Despliegue de referencia (2025)
 API en Docker (compose: `app` + `redis:7-alpine` con password y volumen), publicada como `https://bcc-api.alvaromaxter.es`. Front en Vercel.

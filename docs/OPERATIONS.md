@@ -33,7 +33,7 @@ Redis accesible (`REDIS_HOST=localhost`), `npm install`, `npm start`. Atención:
 
 ## Logs
 - Consola con colores y niveles INFO/SUCCESS/WARN/ERROR/DEBUG/REQUEST con `[contexto]` (`APP`, `CRON`, `SCRAPER`, `REDIS`, `MAIL`, `HTTP`, `ROUTE:*`).
-- `logs/access.log`: una línea por petición. No rota; en Docker no es un volumen, se pierde al recrear el contenedor.
+- `logs/access.log`: una línea por petición (fecha, método, URL, IP de `req.ip`). Rota con `rotating-file-stream` (10 MB × 5 ficheros); en Docker no es un volumen, se pierde al recrear el contenedor. Contiene IPs: ver «Privacidad y datos personales» del README.
 
 ## Mantenimiento habitual
 - Forzar scrapeo: `curl -X POST -H "Authorization: Bearer $FORCE_SCRAPE_TOKEN" <api>/api/comercios/force-scrape`.

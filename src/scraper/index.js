@@ -3,6 +3,7 @@ const cheerio = require("cheerio");
 
 const logger = require("../utils/logger");
 const { sanitizeAll } = require("../utils/geo");
+const { getUserAgent } = require("../utils/userAgent");
 
 const SITE_ORIGIN = "https://bonoscastellodelaplana.es";
 const BASE_URL = `${SITE_ORIGIN}/establecimientos-adheridos-al-programa`;
@@ -48,7 +49,7 @@ async function fetchHtml(url) {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
       const { data } = await axios.get(url, {
-        headers: { "User-Agent": "Mozilla/5.0" },
+        headers: { "User-Agent": getUserAgent().value },
         timeout: REQUEST_TIMEOUT_MS,
       });
       return data;

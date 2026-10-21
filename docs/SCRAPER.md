@@ -4,7 +4,7 @@ Es la pieza más frágil: depende del HTML de la web oficial. Si el Ayuntamiento
 
 ## Qué hace
 1. Parte de `BASE_URL = https://bonoscastellodelaplana.es/establecimientos-adheridos-al-programa` (la web 2026 sirve https; sus enlaces internos siguen siendo `http://`, por eso se fuerzan a https).
-2. `scrapePage(url)`: GET con `User-Agent: Mozilla/5.0`, timeout 20 s y 2 reintentos, carga el HTML en cheerio.
+2. `scrapePage(url)`: GET con el `User-Agent` de `SCRAPER_USER_AGENT` (por defecto uno descriptivo `ComercioCastellonNotificator/<versión> (+web del proyecto)`), timeout 20 s y 2 reintentos, carga el HTML en cheerio.
 3. Cada comercio es un `.col-sm-12.col-md-6.col-xxl-4` que contiene una tabla:
 
 | Campo | Selector dentro de la tarjeta |
@@ -30,7 +30,7 @@ La web oficial geocodifica mal a algunos comercios (p. ej. una avenida de Castel
 Los casos corregidos y excluidos se registran en un `WARN` `[SCRAPER]` con su distancia. Con los datos del 20-oct-2026: 3 corregidos y 1 excluido de 71.
 
 ## Cómo repararlo si la web cambia
-1. Descargar una página real: `curl -s -A "Mozilla/5.0" "<URL>" > /tmp/page.html` y abrirla.
+1. Descargar una página real: `curl -s -A "ComercioCastellonNotificator/dev" "<URL>" > /tmp/page.html` y abrirla.
 2. Localizar el contenedor repetido de cada comercio y actualizar el selector de `$(".col-...")`.
 3. Actualizar los selectores de campo y la lógica del enlace "Siguiente".
 4. Probar sin Redis ni cron:

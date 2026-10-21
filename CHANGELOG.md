@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.4.0 - 2026-10-21
+
+### Añadido
+- **El scraper se identifica**: el `User-Agent` deja de ser `Mozilla/5.0` y pasa a ser configurable con `SCRAPER_USER_AGENT`. Por defecto: `ComercioCastellonNotificator/<versión> (+https://bono-castellon.alvaromaxter.es/; proyecto independiente sin ánimo de lucro)`, de modo que la web oficial sabe quién consulta y puede contactar. Un valor inválido (no ASCII, saltos de línea, >300 caracteres) se ignora con aviso. Se registra al arrancar. Comprobado: la web oficial responde igual (200) con el nuevo valor. Tests: 40 (4 nuevos).
+
 ## v2.3.0 - 2026-10-21
 
 ### Añadido

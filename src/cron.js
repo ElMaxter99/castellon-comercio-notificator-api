@@ -11,6 +11,7 @@ const { diffComercios } = require("./utils/diff");
 const { sendDiffEmail } = require("./services/mailService");
 const cron = require("node-cron");
 const { getSchedule } = require("./utils/schedule");
+const { getUserAgent } = require("./utils/userAgent");
 
 async function runScrape(manual = false) {
   logger.info(manual ? "Scrapeo manual iniciado" : "Ejecutando scrapeo automático", {
@@ -91,6 +92,11 @@ async function runScrape(manual = false) {
 }
 
 async function startCron() {
+  const userAgent = getUserAgent();
+  for (const warning of userAgent.warnings) {
+    logger.warn(warning, { context: "CRON" });
+  }
+  logger.info(`User-Agent del scraper: ${userAgent.value}`, { context: "CRON" });
   const schedule = getSchedule();
   for (const warning of schedule.warnings) {
     logger.warn(warning, { context: "CRON" });

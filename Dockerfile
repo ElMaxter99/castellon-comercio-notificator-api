@@ -6,11 +6,11 @@ FROM node:26.12.0-trixie-slim
 # Directorio de trabajo
 WORKDIR /usr/src/app
 
-# Copiamos solo package.json primero
+# Copiamos solo package.json y package-lock.json primero (caché de capas)
 COPY package*.json ./
 
-# Instalamos dependencias (solo las de producción)
-RUN npm install --omit=dev
+# Instalamos exactamente lo del lock (solo las de producción)
+RUN npm ci --omit=dev
 
 # Copiamos el resto del código SIN borrar node_modules
 COPY . .

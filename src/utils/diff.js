@@ -18,55 +18,75 @@ function groupByName(list) {
   return groups;
 }
 
-/**
- * De `items` (mismo nombre) elige los `count` que no tienen pareja en `others` por dirección.
- * Así, con dos comercios homónimos, se detecta cuál es el nuevo.
- */
-function pickUnmatched(items, others, count) {
-  const remaining = new Map();
-  for (const o of others) {
-    const addr = normalize(o.address);
-    remaining.set(addr, (remaining.get(addr) || 0) + 1);
-  }
-  const unmatched = [];
-  for (const item of items) {
-    const addr = normalize(item.address);
-    if (remaining.get(addr) > 0) remaining.set(addr, remaining.get(addr) - 1);
-    else unmatched.push(item);
-  }
-  return unmatched.slice(0, count);
+/** Campos cuyo cambio se notifica como «modificado» (la imagen se ignora: su URL cambia sin avisar). */
+const TRACKED_FIELDS = ["sector", "phone", "address", "mapsUrl"];
+
+function changedFields(before, after) {
+  return TRACKED_FIELDS.filter((field) => normalize(before[field]) !== normalize(after[field]));
 }
 
 /**
- * Altas y bajas entre dos listados.
+ * Empareja los comercios de un mismo nombre: primero por dirección y, con lo que sobre, por
+ * orden (una dirección corregida). Lo que quede sin pareja es alta (nuevos) o baja (antiguos).
+ */
+function pairGroup(olds, news) {
+  const oldByAddress = new Map();
+  for (const old of olds) {
+    const addr = normalize(old.address);
+    if (!oldByAddress.has(addr)) oldByAddress.set(addr, []);
+    oldByAddress.get(addr).push(old);
+  }
+
+  const pairs = [];
+  const unpairedNew = [];
+  for (const item of news) {
+    const candidates = oldByAddress.get(normalize(item.address));
+    if (candidates?.length) pairs.push([candidates.shift(), item]);
+    else unpairedNew.push(item);
+  }
+
+  const paired = new Set(pairs.map(([old]) => old));
+  const unpairedOld = olds.filter((old) => !paired.has(old));
+
+  const shared = Math.min(unpairedNew.length, unpairedOld.length);
+  for (let i = 0; i < shared; i++) pairs.push([unpairedOld[i], unpairedNew[i]]);
+
+  return {
+    pairs,
+    added: unpairedNew.slice(shared),
+    removed: unpairedOld.slice(shared),
+  };
+}
+
+/**
+ * Altas, bajas y modificaciones entre dos listados.
  * - Se compara por nombre (sin mayúsculas, acentos ni espacios repetidos).
- * - Si un nombre aparece varias veces (comercios homónimos), cuenta cuántos hay y usa la
- *   dirección solo para decidir cuál es el alta o la baja. Corregir la dirección de un comercio
- *   no genera una alta ni una baja.
+ * - Si un nombre aparece varias veces (comercios homónimos), la dirección sirve para emparejarlos.
+ * - Un comercio emparejado cuyo sector, teléfono, dirección o enlace de mapa han cambiado es una
+ *   modificación (`{ name, before, after, changes }`), no una alta ni una baja.
  */
 function diffComercios(oldList, newList) {
   const oldGroups = groupByName(oldList);
   const newGroups = groupByName(newList);
   const added = new Set();
   const removed = new Set();
+  const modified = new Map();
 
-  for (const [key, news] of newGroups) {
-    const olds = oldGroups.get(key) || [];
-    if (news.length > olds.length) {
-      for (const item of pickUnmatched(news, olds, news.length - olds.length)) added.add(item);
-    }
-  }
-  for (const [key, olds] of oldGroups) {
-    const news = newGroups.get(key) || [];
-    if (olds.length > news.length) {
-      for (const item of pickUnmatched(olds, news, olds.length - news.length)) removed.add(item);
+  for (const key of new Set([...oldGroups.keys(), ...newGroups.keys()])) {
+    const group = pairGroup(oldGroups.get(key) || [], newGroups.get(key) || []);
+    group.added.forEach((item) => added.add(item));
+    group.removed.forEach((item) => removed.add(item));
+    for (const [before, after] of group.pairs) {
+      const changes = changedFields(before, after);
+      if (changes.length) modified.set(after, { name: after.name, before, after, changes });
     }
   }
 
   return {
     added: newList.filter((c) => added.has(c)),
     removed: oldList.filter((c) => removed.has(c)),
+    modified: newList.filter((c) => modified.has(c)).map((c) => modified.get(c)),
   };
 }
 
-module.exports = { diffComercios };
+module.exports = { diffComercios, TRACKED_FIELDS };

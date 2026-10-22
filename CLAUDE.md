@@ -20,7 +20,8 @@ Proyecto independiente y sin ánimo de lucro; no tiene relación oficial con el 
 | `src/services/redisService.js` | Lectura/escritura en Redis (claves `ENV:NAMESPACE:nombre`) |
 | `src/services/mailService.js` | Email con proveedor `smtp` (nodemailer) o `resend` (API HTTPS), `sendDiffEmail` (solo altas) |
 | `src/services/templateService.js` + `src/templates/updateEmail.html` | Render del email (escapa HTML) |
-| `src/utils/diff.js` | Diff por **nombre** (altas/bajas) |
+| `src/utils/diff.js` | Diff por **nombre** normalizado: altas, bajas y **modificaciones** (sector, teléfono, dirección, mapa); empareja homónimos por dirección |
+| `src/utils/history.js` · `src/utils/ttlCache.js` · `src/utils/redisDb.js` | Tope del histórico, caché en memoria del catálogo (`CATALOG_CACHE_SECONDS`) y base de datos de Redis (`REDIS_DB`) |
 | `src/utils/geo.js` · `src/utils/health.js` · `src/middleware/adminAuth.js` | Saneado de coordenadas, evaluación de salud y token de administración |
 | `src/middleware/rateLimiter.js` | Límite en memoria por IP |
 | `scripts/*.sh`, `scripts/syncSectors.js` | Operación Docker y reparación de sectores |
@@ -40,7 +41,7 @@ npm start                 # node src/app.js (necesita Redis accesible)
 docker compose up --build # API + Redis
 node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
 ```
-`npm test` ejecuta los tests (`node --test`, carpeta `test/`: geo, auth, salud, parser de query y frecuencia del cron). El **CI** (`.github/workflows/ci.yml`) corre en cada PR: tests + sintaxis, arranque real con Redis (`/api/status`, `/api/health`, 403 de `force-scrape`) y build de la imagen Docker. No hay linter ni build step.
+`npm test` ejecuta los tests (`node --test`, carpeta `test/`: geo, auth, salud, parser de query, cron, User-Agent, Redis, histórico, caché, candado, cierre, cabeceras, diff y scraper con HTML de ejemplo en `test/fixtures/`). El **CI** (`.github/workflows/ci.yml`) corre en cada PR: tests + sintaxis, arranque real con Redis (`/api/status`, `/api/health`, 403 de `force-scrape`) y build de la imagen Docker. No hay linter ni build step.
 
 ## Convenciones
 - CommonJS (`require`), Node ≥ 22 (el Dockerfile usa `node:26.12.0-trixie-slim`; las dependencias exigen Node ≥ 20).
@@ -56,9 +57,9 @@ node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
 
 ## Trampas conocidas (no las "arregles" sin preguntar)
 1. El scraper usa **selectores CSS acoplados al HTML** de la web oficial; si no devuelve nada, ver `docs/SCRAPER.md`.
-2. `runScrape` **guarda en Redis solo si hay diferencias**, y `saveLastUpdate` se ejecuta aunque no las haya.
+2. `runScrape` **guarda en Redis solo si hay diferencias** (altas, bajas o modificaciones), y `saveLastUpdate` se ejecuta aunque no las haya. No se solapa: si ya hay un scrapeo en curso, la nueva ejecución se omite (`force-scrape` → 409).
 3. Si el scrapeo devuelve 0 comercios se aborta y se conserva el catálogo (`force-scrape` responde 502). Un cambio de edición con el mismo namespace de Redis genera altas/bajas masivas: cambiar `REDIS_NAMESPACE`.
-4. `POST /api/comercios/force-scrape` exige `FORCE_SCRAPE_TOKEN`; sin la variable está **deshabilitada** (403). `/api/health` da 503 si los datos llevan >15 min sin actualizarse.
+4. `POST /api/comercios/force-scrape` exige `FORCE_SCRAPE_TOKEN`; sin la variable está **deshabilitada** (403). `/api/health` da 503 si los datos llevan demasiado sin actualizarse (15 min por defecto; se deduce de `SCRAPE_CRON`).
 5. **Express y el filtro**: `/api/comercios/filter` rechaza (400) `?name[]=x` o `?sector[a]=1`; eso exige el parseador de query *extended* (`utils/expressSetup.js`). Express 5 usa *simple* por defecto: no quites esa configuración al actualizar Express (hay un test que lo protege).
 6. La web oficial enlaza con `http://`; el scraper fuerza https en todas las URLs que sigue.
-7. `package-lock.json` está en `.gitignore`.
+7. `package-lock.json` **sí se versiona** (v2.9.0): el CI y el Dockerfile usan `npm ci`. Si cambias `dependencies`, regenera el lock con `npm install` (npm ≥ 11) y súbelo en el mismo PR; con `npm ci` un lock desfasado rompe el CI. Dependabot lo actualiza solo.

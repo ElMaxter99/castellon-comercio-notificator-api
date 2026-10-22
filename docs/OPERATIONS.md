@@ -13,6 +13,7 @@
 | `GEO_CENTER_LAT` · `GEO_CENTER_LNG` · `GEO_RADIUS_KM` · `GEO_CITY` | Castelló · 30 km | Zona válida para las coordenadas de los comercios (ver `SCRAPER.md`) |
 | `TRUST_PROXY` | — | Nº de proxies inversos delante (Render = 1). Necesario para que el rate limit distinga IPs |
 | `RATE_LIMIT_WINDOW_MS` | `60000` | Ventana del rate limit |
+| `CATALOG_CACHE_SECONDS` | `30` | Caché en memoria del catálogo para no leer y parsear el JSON de Redis en cada petición. Se invalida al guardar; el cron siempre lee de Redis. `0` la desactiva |
 | `HISTORY_MAX_ENTRIES` | `500` | Tope del histórico de altas/bajas en Redis; al añadir se descartan las más antiguas |
 | `RATE_LIMIT_MAX_REQUESTS` | `120` | Máx. peticiones por IP y ventana |
 | `REDIS_URL` | — | Si existe, ignora host/port/password |
@@ -44,7 +45,7 @@ Redis accesible (`REDIS_HOST=localhost`), `npm install`, `npm start`. Atención:
 ## Mantenimiento habitual
 - Forzar scrapeo: `curl -X POST -H "Authorization: Bearer $FORCE_SCRAPE_TOKEN" <api>/api/comercios/force-scrape`.
 - Comprobar la salud de los datos: `curl <api>/api/health` (503 si el scrapeo está parado).
-- Tests: `npm test` (runner integrado de Node, sin dependencias). El CI (`.github/workflows/ci.yml`) ejecuta además un *smoke test* con un Redis real y construye la imagen Docker; Dependabot propone actualizaciones de npm (semanal), Docker y Actions (mensual) a `develop`.
+- Tests: `npm test` (runner integrado de Node, sin dependencias). El CI (`.github/workflows/ci.yml`) ejecuta además un *smoke test* con un Redis real y construye la imagen Docker; `package-lock.json` está versionado y el CI/Docker instalan con `npm ci` (instalaciones reproducibles); Dependabot propone actualizaciones de npm (semanal), Docker y Actions (mensual) a `develop`.
 - Reconstruir sectores: `docker compose exec app node scripts/syncSectors.js`.
 - Ver datos: `docker compose exec redis redis-cli -a $REDIS_PASSWORD -n <db> GET prod:bonos:comercios`.
 - Reiniciar de cero una edición: borrar claves `*:bonos:comercios|history|sectors|last-update` (ver `REUSE-2026.md`).

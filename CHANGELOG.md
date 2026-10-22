@@ -1,5 +1,15 @@
 # Changelog
 
+## v2.8.0 - 2026-10-22
+
+### Añadido
+- **Detección de modificaciones**: un comercio que sigue en el listado pero cambia de `sector`, `phone`, `address` o `mapsUrl` ya no pasa inadvertido. El catálogo guardado se actualiza y el histórico anota la entrada con `modified: [{ name, changes }]` (sin correo; la imagen se ignora porque su URL cambia sin avisar). Los homónimos se emparejan por dirección.
+- **Caché en memoria del catálogo** (`CATALOG_CACHE_SECONDS`, 30 s por defecto; 0 la desactiva): `GET /api/comercios` y compañía dejan de leer y parsear el JSON completo de Redis en cada petición. Se invalida al guardar y el cron siempre compara contra Redis.
+
+### Documentación
+- `CLAUDE.md` al día (diff, tests, candado del scrapeo, salud según `SCRAPE_CRON`).
+- Tests: 83 (8 nuevos).
+
 ## v2.7.0 - 2026-10-21
 
 ### Añadido

@@ -29,7 +29,7 @@ Consumir mejor el listado de establecimientos adheridos al programa de bonos de 
 6. Siempre al final: `saveLastUpdate()`.
 7. Cualquier excepción se loguea y se traga (el cron no muere).
 
-Consecuencias del diff por nombre: si un comercio cambia teléfono/dirección/imagen pero no nombre, **no se detecta ni se guarda** el cambio. Dos comercios con el mismo nombre (sucursales) sí se distinguen (por recuento + dirección); corregir solo la dirección no genera alta ni baja.
+Consecuencias del diff por nombre: un cambio solo de imagen no se detecta ni se guarda; un cambio de nombre es una baja más una alta. Dos comercios con el mismo nombre (sucursales) sí se distinguen (se emparejan por dirección). Un comercio emparejado cuyo `sector`, `phone`, `address` o `mapsUrl` cambian es una **modificación** (`modified`): se guarda el catálogo nuevo y se anota en el histórico, sin correo (la imagen se ignora).
 
 ## Saneado, administración y salud
 - `utils/geo.js` limpia coordenadas atípicas tras el scrapeo (ver [SCRAPER.md](SCRAPER.md)).
@@ -45,7 +45,7 @@ Consecuencias del diff por nombre: si un comercio cambia teléfono/dirección/im
 |---|---|
 | `comercios` | JSON array `[{ name, sector, phone, address, img, mapsUrl }]` |
 | `last-update` | ISO string del último scrapeo terminado sin excepción |
-| `history` | JSON array, **más reciente primero**: `{ timestamp, added: string[], removed: string[], countAfter }` (solo nombres); acotado a `HISTORY_MAX_ENTRIES` (500) |
+| `history` | JSON array, **más reciente primero**: `{ timestamp, added: string[], removed: string[], countAfter }` (solo nombres; `modified` lleva `{ name, changes }`); acotado a `HISTORY_MAX_ENTRIES` (500) |
 | `sectors` | JSON array de sectores únicos (`"Sin sector"` si vacío) |
 
 Todo se guarda como un único blob JSON por clave (sin TTL). El histórico crece sin límite y se reescribe entero en cada cambio.

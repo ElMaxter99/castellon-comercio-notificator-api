@@ -41,7 +41,7 @@ async function doScrape(manual) {
 
   try {
     const nuevos = await scrapeComercios();
-    const antiguos = await getComercios();
+    const antiguos = await getComercios({ fresh: true });
 
     // Protección: una web caída o cambiada devuelve 0 comercios; no se debe
     // vaciar el catálogo ni registrar "bajas" masivas.
@@ -55,12 +55,13 @@ async function doScrape(manual) {
 
     const diff = diffComercios(antiguos, nuevos);
 
-    if (diff.added.length || diff.removed.length) {
+    if (diff.added.length || diff.removed.length || diff.modified.length) {
       logger.info("Cambios detectados, actualizando Redis e histórico", {
         context: "CRON",
         meta: {
           added: diff.added.length,
           removed: diff.removed.length,
+          modified: diff.modified.length,
           total: nuevos.length,
         },
       });
@@ -69,6 +70,7 @@ async function doScrape(manual) {
       await addHistoryEntry({
         added: diff.added,
         removed: diff.removed,
+        modified: diff.modified,
         total: nuevos.length,
       });
 
@@ -89,7 +91,7 @@ async function doScrape(manual) {
           removed: diff.removed,
         });
       } else {
-        logger.warn("No hay nuevos comercios para notificar por correo", {
+        logger.info("Sin nuevos comercios que notificar por correo (solo bajas o modificaciones)", {
           context: "CRON",
         });
       }
@@ -100,10 +102,11 @@ async function doScrape(manual) {
     await saveLastUpdate();
     return {
       ok: true,
-      changed: diff.added.length > 0 || diff.removed.length > 0,
+      changed: diff.added.length > 0 || diff.removed.length > 0 || diff.modified.length > 0,
       total: nuevos.length,
       added: diff.added.length,
       removed: diff.removed.length,
+      modified: diff.modified.length,
     };
   } catch (err) {
     logger.error("Error en scrapeo", { context: "CRON", meta: err });
@@ -139,7 +142,7 @@ async function startCron() {
   );
 
   // Con Redis vacío (primer arranque o namespace nuevo) no se espera al primer tick.
-  const actuales = await getComercios();
+  const actuales = await getComercios({ fresh: true });
   if (actuales.length === 0) {
     logger.info("Catálogo vacío: scrapeo inicial", { context: "CRON" });
     await runScrape(false);

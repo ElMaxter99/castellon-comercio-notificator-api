@@ -1,5 +1,10 @@
 const { redis, ENV, NAMESPACE } = require("../config/redis");
 const { pushHistory } = require("../utils/history");
+const { createTtlCache, resolveCatalogCacheMs } = require("../utils/ttlCache");
+
+// El catálogo solo cambia en cada scrapeo: se cachea en memoria para no leer y parsear el JSON
+// completo de Redis en cada petición. Se invalida al guardar; el cron siempre lee de Redis.
+const catalogCache = createTtlCache(resolveCatalogCacheMs());
 
 function key(name) {
   return `${ENV}:${NAMESPACE}:${name}`;
@@ -7,15 +12,22 @@ function key(name) {
 
 async function saveComercios(comercios) {
   await redis.set(key("comercios"), JSON.stringify(comercios));
+  catalogCache.clear();
 }
 
-async function getComercios() {
+/** `fresh: true` se salta la caché (lo usa el cron para comparar contra lo realmente guardado). */
+async function getComercios({ fresh = false } = {}) {
+  if (!fresh) {
+    const cached = catalogCache.get();
+    if (cached) return cached;
+  }
   const data = await redis.get(key("comercios"));
-  return data ? JSON.parse(data) : [];
+  return catalogCache.set(data ? JSON.parse(data) : []);
 }
 
 async function deleteComercios() {
   await redis.del(key("comercios"));
+  catalogCache.clear();
 }
 
 async function saveLastUpdate(date = new Date()) {
@@ -27,11 +39,12 @@ async function getLastUpdate() {
   return date ? new Date(date) : null;
 }
 
-async function addHistoryEntry({ added, removed, total }) {
+async function addHistoryEntry({ added, removed, modified = [], total }) {
   const entry = {
     timestamp: new Date().toISOString(),
     added: added.map((c) => c.name),
     removed: removed.map((c) => c.name),
+    modified: modified.map((m) => ({ name: m.name, changes: m.changes })),
     countAfter: total,
   };
 

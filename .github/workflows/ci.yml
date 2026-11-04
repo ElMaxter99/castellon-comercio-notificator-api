@@ -23,10 +23,10 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
+          cache: npm
 
-      # No se versiona package-lock.json, así que no se usa `npm ci` ni la caché de npm.
       - name: Instalar dependencias
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Comprobar sintaxis
         run: find src scripts test -name '*.js' -print0 | xargs -0 -n1 node --check
@@ -54,9 +54,10 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
+          cache: npm
 
       - name: Instalar dependencias
-        run: npm install --omit=dev --no-audit --no-fund
+        run: npm ci --omit=dev --no-audit --no-fund
 
       - name: Arrancar y comprobar /api/status y /api/health
         env:

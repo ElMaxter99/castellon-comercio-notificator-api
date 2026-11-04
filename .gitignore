@@ -8,5 +8,4 @@
 
 # No copy
 node_modules
-package-lock.json
 logs/

@@ -62,4 +62,4 @@ node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
 4. `POST /api/comercios/force-scrape` exige `FORCE_SCRAPE_TOKEN`; sin la variable está **deshabilitada** (403). `/api/health` da 503 si los datos llevan demasiado sin actualizarse (15 min por defecto; se deduce de `SCRAPE_CRON`).
 5. **Express y el filtro**: `/api/comercios/filter` rechaza (400) `?name[]=x` o `?sector[a]=1`; eso exige el parseador de query *extended* (`utils/expressSetup.js`). Express 5 usa *simple* por defecto: no quites esa configuración al actualizar Express (hay un test que lo protege).
 6. La web oficial enlaza con `http://`; el scraper fuerza https en todas las URLs que sigue.
-7. `package-lock.json` está en `.gitignore`.
+7. `package-lock.json` **sí se versiona** (v2.9.0): el CI y el Dockerfile usan `npm ci`. Si cambias `dependencies`, regenera el lock con `npm install` (npm ≥ 11) y súbelo en el mismo PR; con `npm ci` un lock desfasado rompe el CI. Dependabot lo actualiza solo.

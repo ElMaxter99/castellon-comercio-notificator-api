@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.9.0 - 2026-10-22
+
+### Cambiado
+- **`package-lock.json` se versiona** y todo instala con `npm ci`: CI (`test`, `smoke`) y `Dockerfile` (`npm ci --omit=dev`). Instalaciones reproducibles: un `npm install` ya no puede traer versiones nuevas por sorpresa entre dos ejecuciones. Se activa la caché de npm en el CI. Comprobado: `npm ci` funciona con npm 10 (Node 22 del CI) y npm 11 (imagen Node 26), y los tests pasan con el árbol del lock.
+- Quitado `package-lock.json` de `.gitignore` y actualizados `CLAUDE.md` (trampa 7) y `docs/OPERATIONS.md`.
+
 ## v2.8.0 - 2026-10-22
 
 ### Añadido

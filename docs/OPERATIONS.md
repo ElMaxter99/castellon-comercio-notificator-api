@@ -7,6 +7,7 @@
 | `PORT` | `12001` | Puerto HTTP |
 | `FORCE_SCRAPE_TOKEN` | — | Token de `POST /api/comercios/force-scrape` (`Authorization: Bearer`). Sin definir, la ruta está deshabilitada. Genera uno largo: `openssl rand -hex 32` |
 | `SCRAPER_USER_AGENT` | `ComercioCastellonNotificator/<versión> (+https://bono-castellon.alvaromaxter.es/; …)` | `User-Agent` del scraper. Vacío → el de por defecto; con caracteres no ASCII, saltos de línea o más de 300 caracteres se ignora (aviso `WARN [CRON]`). Conviene incluir un contacto |
+| `MOCK_MODE` | — | `true` → la API sirve datos de demostración (`src/mock/`), no abre Redis ni lanza el cron/correo; `/api/comercios/status` devuelve `mode: "mock"` y `force-scrape` responde 409. Para el periodo entre ediciones: [`EDICION-2027.md`](EDICION-2027.md) |
 | `SCRAPE_CRON` | `*/5 * * * *` | Frecuencia del scrapeo: expresión cron de **5 campos**. Mínimo 5 min entre ejecuciones; una expresión inválida, con segundos o más frecuente se ignora y se usa la de por defecto (aviso `WARN [CRON]` en el arranque). Ejemplos: `*/15 * * * *`, `0 * * * *`, `0 8-22 * * *` |
 | `SCRAPE_CRON_TIMEZONE` | zona del servidor | Zona horaria IANA de `SCRAPE_CRON` (p. ej. `Europe/Madrid`; en Docker/Render el servidor va en UTC) |
 | `HEALTH_MAX_AGE_MINUTES` | deducida | Antigüedad máxima de los datos para que `/api/health` responda 200. Sin definir: 1,5 × el mayor hueco entre ejecuciones de `SCRAPE_CRON` (mínimo 15), así un cron horario no da falsas alarmas |

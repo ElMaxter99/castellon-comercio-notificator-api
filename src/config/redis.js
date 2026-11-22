@@ -1,6 +1,7 @@
 const Redis = require("ioredis");
 const logger = require("../utils/logger");
 const { resolveRedisDb } = require("../utils/redisDb");
+const { isMockMode } = require("../utils/mockMode");
 
 const {
   REDIS_URL,
@@ -27,6 +28,8 @@ logger.info("Conectando a Redis", {
 
 const redis = new Redis(connectionUri, {
   db: resolveRedisDb(process.env),
+  // En MOCK_MODE no hace falta Redis: no se abre la conexión (y no se llena el log de errores).
+  lazyConnect: isMockMode(),
   retryStrategy: (times) => Math.min(times * 50, 2000),
 });
 

@@ -20,6 +20,7 @@ Proyecto independiente y sin ánimo de lucro; no tiene relación oficial con el 
 | `src/services/redisService.js` | Lectura/escritura en Redis (claves `ENV:NAMESPACE:nombre`) |
 | `src/services/mailService.js` | Email con proveedor `smtp` (nodemailer) o `resend` (API HTTPS), `sendDiffEmail` (solo altas) |
 | `src/services/templateService.js` + `src/templates/updateEmail.html` | Render del email (escapa HTML) |
+| `src/utils/mockMode.js` · `src/services/dataSource.js` · `src/services/mockData.js` · `src/mock/*.json` | `MOCK_MODE=true`: las rutas sirven datos ficticios (sin Redis, cron ni correo). Estado entre ediciones: `docs/EDICION-2027.md` |
 | `src/utils/diff.js` | Diff por **nombre** normalizado: altas, bajas y **modificaciones** (sector, teléfono, dirección, mapa); empareja homónimos por dirección |
 | `src/utils/history.js` · `src/utils/ttlCache.js` · `src/utils/redisDb.js` | Tope del histórico, caché en memoria del catálogo (`CATALOG_CACHE_SECONDS`) y base de datos de Redis (`REDIS_DB`) |
 | `src/utils/geo.js` · `src/utils/health.js` · `src/middleware/adminAuth.js` | Saneado de coordenadas, evaluación de salud y token de administración |
@@ -62,4 +63,5 @@ node scripts/syncSectors.js   # reconstruye el catálogo de sectores desde Redis
 4. `POST /api/comercios/force-scrape` exige `FORCE_SCRAPE_TOKEN`; sin la variable está **deshabilitada** (403). `/api/health` da 503 si los datos llevan demasiado sin actualizarse (15 min por defecto; se deduce de `SCRAPE_CRON`).
 5. **Express y el filtro**: `/api/comercios/filter` rechaza (400) `?name[]=x` o `?sector[a]=1`; eso exige el parseador de query *extended* (`utils/expressSetup.js`). Express 5 usa *simple* por defecto: no quites esa configuración al actualizar Express (hay un test que lo protege).
 6. La web oficial enlaza con `http://`; el scraper fuerza https en todas las URLs que sigue.
+8. **Modo mock** (`MOCK_MODE=true`, el estado actual en producción entre ediciones): las rutas leen de `dataSource.js`; **no añadas lecturas directas a `redisService` en rutas nuevas** o se saltarán el mock. Los datos reales de Redis no se tocan.
 7. `package-lock.json` **sí se versiona** (v2.9.0): el CI y el Dockerfile usan `npm ci`. Si cambias `dependencies`, regenera el lock con `npm install` (npm ≥ 11) y súbelo en el mismo PR; con `npm ci` un lock desfasado rompe el CI. Dependabot lo actualiza solo.

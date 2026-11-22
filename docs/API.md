@@ -3,6 +3,8 @@
 Base: `http://localhost:12001` en local; producción 2025: `https://bcc-api.alvaromaxter.es`.
 CORS abierto (`*`). Rate limit por defecto: 120 peticiones/min/IP → `429 {"ok":false,"error":"Too many requests, please try again later."}`.
 
+> Con `MOCK_MODE=true` todas las rutas de datos devuelven datos de demostración; `/api/status`, `/api/health` y `/api/comercios/status` incluyen `mode: "mock"` (en normal, `"live"`) y `force-scrape` responde `409`.
+
 ## `GET /api/status`
 Healthcheck general.
 ```json

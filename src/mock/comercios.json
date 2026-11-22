@@ -1,0 +1,258 @@
+[
+  {
+    "name": "BAR DEMO 06",
+    "sector": "Hostelería",
+    "phone": "964 000 006",
+    "address": "PLAZA FICTICIA 108",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9865309,-0.0479047"
+  },
+  {
+    "name": "BOLSOS DEMO 13",
+    "sector": "Moda y complementos",
+    "phone": "964 000 013",
+    "address": "RONDA DEL MUESTRARIO 72",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9883340,-0.0502419"
+  },
+  {
+    "name": "BOUTIQUE DEMO 10",
+    "sector": "Moda y complementos",
+    "phone": "964 000 010",
+    "address": "CALLE DEMO 42",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9941856,-0.0468563"
+  },
+  {
+    "name": "CAFETERÍA DEMO 07",
+    "sector": "Hostelería",
+    "phone": "964 000 007",
+    "address": "CARRER DE PROVA 49",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9830148,-0.0460156"
+  },
+  {
+    "name": "CARNICERÍA DEMO 03",
+    "sector": "Alimentación",
+    "phone": "964 000 003",
+    "address": "PLAZA FICTICIA 37",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9793614,-0.0347399"
+  },
+  {
+    "name": "COMERCIO DEMO SIN UBICACIÓN",
+    "sector": "Servicios",
+    "phone": "",
+    "address": "CALLE SIN COORDENADAS 1",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Calle%20Sin%20Coordenadas%201%2C%20Castell%C3%B3%20de%20la%20Plana"
+  },
+  {
+    "name": "COPISTERÍA DEMO 27",
+    "sector": "Servicios",
+    "phone": "964 000 027",
+    "address": "PLAZA FICTICIA 31",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9910307,-0.0397517"
+  },
+  {
+    "name": "CRISTALERÍA DEMO 15",
+    "sector": "Hogar",
+    "phone": "964 000 015",
+    "address": "PLAZA FICTICIA 76",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9804565,-0.0515410"
+  },
+  {
+    "name": "ELECTRODOMÉSTICOS DEMO 31",
+    "sector": "Tecnología",
+    "phone": "964 000 031",
+    "address": "PLAZA FICTICIA 46",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9840489,-0.0434982"
+  },
+  {
+    "name": "FERRETERÍA DEMO 14",
+    "sector": "Hogar",
+    "phone": "964 000 014",
+    "address": "CALLE DEMO 63",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9918445,-0.0375164"
+  },
+  {
+    "name": "FLORISTERÍA DEMO 17",
+    "sector": "Hogar",
+    "phone": "964 000 017",
+    "address": "RONDA DEL MUESTRARIO 17",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9760210,-0.0337919"
+  },
+  {
+    "name": "FRUTERÍA DEMO 02",
+    "sector": "Alimentación",
+    "phone": "964 000 002",
+    "address": "AVENIDA DE EJEMPLO 52",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9824946,-0.0404175"
+  },
+  {
+    "name": "HELADERÍA DEMO 09",
+    "sector": "Hostelería",
+    "phone": "964 000 009",
+    "address": "CALLE DEMO 99",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9916075,-0.0431446"
+  },
+  {
+    "name": "HERBOLARIO DEMO 20",
+    "sector": "Salud y belleza",
+    "phone": "964 000 020",
+    "address": "CARRER DE PROVA 27",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9864323,-0.0279470"
+  },
+  {
+    "name": "INFORMÁTICA DEMO 29",
+    "sector": "Tecnología",
+    "phone": "964 000 029",
+    "address": "AVENIDA DE EJEMPLO 84",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9759977,-0.0466782"
+  },
+  {
+    "name": "JOYERÍA DEMO 12",
+    "sector": "Moda y complementos",
+    "phone": "964 000 012",
+    "address": "AVENIDA DE EJEMPLO 35",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9845177,-0.0355597"
+  },
+  {
+    "name": "JUGUETERÍA DEMO 23",
+    "sector": "Ocio y cultura",
+    "phone": "964 000 023",
+    "address": "RONDA DEL MUESTRARIO 72",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9908047,-0.0448044"
+  },
+  {
+    "name": "LAVANDERÍA DEMO 26",
+    "sector": "Servicios",
+    "phone": "964 000 026",
+    "address": "AVENIDA DE EJEMPLO 33",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9900912,-0.0392811"
+  },
+  {
+    "name": "LIBRERÍA DEMO 22",
+    "sector": "Ocio y cultura",
+    "phone": "964 000 022",
+    "address": "CALLE DEMO 62",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9859053,-0.0453902"
+  },
+  {
+    "name": "MÚSICA DEMO 25",
+    "sector": "Ocio y cultura",
+    "phone": "964 000 025",
+    "address": "CARRER DE PROVA 18",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9926523,-0.0432331"
+  },
+  {
+    "name": "PANADERÍA DEMO 01",
+    "sector": "Alimentación",
+    "phone": "964 000 001",
+    "address": "CALLE DEMO 84",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9777833,-0.0386784"
+  },
+  {
+    "name": "PAPELERÍA DEMO 24",
+    "sector": "Ocio y cultura",
+    "phone": "964 000 024",
+    "address": "AVENIDA DE EJEMPLO 13",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9787555,-0.0417566"
+  },
+  {
+    "name": "PELUQUERÍA DEMO 18",
+    "sector": "Salud y belleza",
+    "phone": "964 000 018",
+    "address": "CALLE DEMO 1",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9828132,-0.0521831"
+  },
+  {
+    "name": "PERFUMERÍA DEMO 21",
+    "sector": "Salud y belleza",
+    "phone": "964 000 021",
+    "address": "AVENIDA DE EJEMPLO 116",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9935226,-0.0411879"
+  },
+  {
+    "name": "PESCADERÍA DEMO 04",
+    "sector": "Alimentación",
+    "phone": "964 000 004",
+    "address": "PLAZA FICTICIA 39",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9905091,-0.0503014"
+  },
+  {
+    "name": "RESTAURANTE DEMO 08",
+    "sector": "Hostelería",
+    "phone": "964 000 008",
+    "address": "PLAZA FICTICIA 118",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9790083,-0.0288593"
+  },
+  {
+    "name": "TAPICERÍA DEMO 16",
+    "sector": "Hogar",
+    "phone": "964 000 016",
+    "address": "CALLE DEMO 69",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9892651,-0.0373903"
+  },
+  {
+    "name": "TELEFONÍA DEMO 30",
+    "sector": "Tecnología",
+    "phone": "964 000 030",
+    "address": "AVENIDA DE EJEMPLO 20",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9933530,-0.0438790"
+  },
+  {
+    "name": "TINTORERÍA DEMO 28",
+    "sector": "Servicios",
+    "phone": "964 000 028",
+    "address": "RONDA DEL MUESTRARIO 112",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9959024,-0.0367493"
+  },
+  {
+    "name": "ULTRAMARINOS DEMO 05",
+    "sector": "Alimentación",
+    "phone": "964 000 005",
+    "address": "PLAZA FICTICIA 55",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9768715,-0.0241129"
+  },
+  {
+    "name": "ZAPATERÍA DEMO 11",
+    "sector": "Moda y complementos",
+    "phone": "964 000 011",
+    "address": "PLAZA FICTICIA 98",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9858683,-0.0368456"
+  },
+  {
+    "name": "ÓPTICA DEMO 19",
+    "sector": "Salud y belleza",
+    "phone": "964 000 019",
+    "address": "RONDA DEL MUESTRARIO 37",
+    "img": "",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=39.9892205,-0.0335597"
+  }
+]

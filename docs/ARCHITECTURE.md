@@ -1,5 +1,7 @@
 # Arquitectura del API
 
+> **Modo mock** (`MOCK_MODE=true`): las rutas leen de `src/services/dataSource.js`, que apunta a `mockData.js` (JSON ficticio en `src/mock/`) en vez de a `redisService.js`; no hay conexión a Redis, cron ni correo. Ver [EDICION-2027.md](EDICION-2027.md).
+
 ## Objetivo
 Consumir mejor el listado de establecimientos adheridos al programa de bonos de Castelló de la Plana (edición 2025): la web oficial solo ofrece un listado paginado sin buscador, sin histórico y sin avisos. Este servicio lo convierte en datos estructurados, detecta cambios y avisa.
 

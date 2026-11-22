@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.10.0 - 2026-11-22
+
+### Añadido
+- **Modo mock (`MOCK_MODE=true`)** para el periodo entre ediciones: la API sirve datos de demostración **ficticios** (`src/mock/`: 32 comercios «DEMO» —uno sin coordenadas—, 5 entradas de histórico con altas, bajas y modificaciones, y fecha de actualización fija), sin abrir Redis, sin cron/scrapeo y sin correo, y sin tocar la web oficial. `/api/status`, `/api/health` y `/api/comercios/status` informan `mode: "mock"` (en normal, `"live"`); `/api/health` siempre en verde; `force-scrape` responde 409. **Los datos reales de 2026 siguen intactos en Redis.**
+- `render.yaml` trae `MOCK_MODE=true`. Guía para pasar a 2027: `docs/EDICION-2027.md`.
+- Tests: 88 (5 nuevos). Probado arrancando sin Redis.
+
 ## v2.9.0 - 2026-10-22
 
 ### Cambiado

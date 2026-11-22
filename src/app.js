@@ -2,7 +2,7 @@ const express = require("express");
 const comerciosRouter = require("./routes/comercios");
 const { startCron, stopCron } = require("./cron");
 const { redis } = require("./config/redis");
-const { getLastUpdate } = require("./services/redisService");
+const { MOCK, getLastUpdate } = require("./services/dataSource");
 const { evaluateHealth } = require("./utils/health");
 const { getSchedule } = require("./utils/schedule");
 const { verifyMailer } = require("./services/mailService");
@@ -57,8 +57,8 @@ app.get("/api/status", (req, res, next) => {
   next();
 }, async (req, res) => {
   try {
-    const redisStatus = await redis.ping();
-    res.json({ ok: true, redis: redisStatus, message: "API running" });
+    const redisStatus = MOCK ? "mock" : await redis.ping();
+    res.json({ ok: true, redis: redisStatus, mode: MOCK ? "mock" : "live", message: "API running" });
   } catch (e) {
     logger.error("Redis unreachable desde /api/status", {
       context: "APP",
@@ -79,9 +79,10 @@ app.get("/api/health", (req, res, next) => {
   next();
 }, async (req, res) => {
   try {
-    const redisStatus = await redis.ping();
+    const redisStatus = MOCK ? "mock" : await redis.ping();
     const lastUpdate = await getLastUpdate();
-    const health = evaluateHealth({
+    // En MOCK_MODE no hay scrapeo: los datos fijos nunca están «obsoletos».
+    const health = MOCK ? { ok: true, stale: false, ageMinutes: 0 } : evaluateHealth({
       lastUpdate,
       uptimeSeconds: process.uptime(),
       maxAgeMinutes: HEALTH_MAX_AGE_MINUTES,
@@ -91,6 +92,7 @@ app.get("/api/health", (req, res, next) => {
     res.status(health.ok ? 200 : 503).json({
       ok: health.ok,
       redis: redisStatus,
+      mode: MOCK ? "mock" : "live",
       lastUpdate: lastUpdate ? lastUpdate.toISOString() : null,
       ageMinutes: health.ageMinutes,
       maxAgeMinutes: HEALTH_MAX_AGE_MINUTES,
@@ -107,6 +109,13 @@ const server = app.listen(port, async () => {
     context: "APP",
     meta: { port },
   });
+  if (MOCK) {
+    logger.warn(
+      "MODO MOCK: se sirven datos de demostración (sin Redis, scrapeo ni correo). Quita MOCK_MODE para volver a los datos reales.",
+      { context: "APP" }
+    );
+    return;
+  }
   await verifyMailer();
   logger.info("Iniciando cron de scrapeo", { context: "APP" });
   await startCron();
@@ -120,7 +129,7 @@ const shutdown = createShutdown({
   steps: [
     ["cron y scrapeo en curso", () => stopCron(10000)],
     ["servidor HTTP", () => new Promise((resolve) => server.close(() => resolve()))],
-    ["Redis", () => redis.quit()],
+    ["Redis", () => (MOCK ? Promise.resolve() : redis.quit())],
   ],
 });
 for (const signal of ["SIGTERM", "SIGINT"]) {

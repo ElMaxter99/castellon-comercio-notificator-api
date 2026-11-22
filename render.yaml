@@ -34,6 +34,8 @@ services:
         sync: false # URL pública del front (se usa en el email)
       - key: FORCE_SCRAPE_TOKEN
         sync: false # openssl rand -hex 32; sin él, POST /api/comercios/force-scrape está deshabilitado
+      - key: MOCK_MODE
+        value: "true" # entre ediciones: datos de demostración, sin scrapeo ni Redis. Ver docs/EDICION-2027.md (quítalo al empezar 2027)
       - key: SCRAPE_CRON
         value: "*/5 * * * *" # frecuencia del scrapeo (cron de 5 campos; mínimo 5 min). P. ej. "0 * * * *" = cada hora
       - key: SCRAPER_USER_AGENT

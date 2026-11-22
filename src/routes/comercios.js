@@ -1,10 +1,11 @@
 const express = require("express");
 const {
+  MOCK,
   getComercios,
   getLastUpdate,
   getHistory,
   getSectors,
-} = require("../services/redisService");
+} = require("../services/dataSource");
 const { runScrape } = require("../cron");
 const requireAdminToken = require("../middleware/adminAuth");
 const logger = require("../utils/logger");
@@ -40,6 +41,7 @@ router.get("/status", async (req, res) => {
 
     res.json({
       environment: process.env.NODE_ENV || "dev",
+      mode: MOCK ? "mock" : "live",
       total: comercios.length,
       lastUpdate: lastUpdate ? lastUpdate.toISOString() : null,
     });
@@ -73,6 +75,9 @@ router.get("/history", async (req, res) => {
  * Forzar scrapeo manual (requiere `Authorization: Bearer $FORCE_SCRAPE_TOKEN`)
  */
 router.post("/force-scrape", requireAdminToken, async (req, res) => {
+  if (MOCK) {
+    return res.status(409).json({ ok: false, error: "Modo mock: el scrapeo está deshabilitado" });
+  }
   try {
     const result = await runScrape(true);
     if (result.skipped) {

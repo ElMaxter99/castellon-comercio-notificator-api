@@ -33,7 +33,8 @@ Proyecto independiente y sin ánimo de lucro; no tiene relación oficial con el 
 - [`docs/SCRAPER.md`](docs/SCRAPER.md) — cómo funciona el scraping y cómo repararlo si la web cambia.
 - [`docs/OPERATIONS.md`](docs/OPERATIONS.md) — variables de entorno, Docker, despliegue, logs.
 - [`docs/HOSTING.md`](docs/HOSTING.md) — hosting gratuito (Render + Upstash + pinger) y `render.yaml`.
-- [`docs/REUSE-2026.md`](docs/REUSE-2026.md) — **checklist para reutilizar el proyecto en la edición 2026**.
+- [`docs/EDICION-2027.md`](docs/EDICION-2027.md) — **guía para retomar el proyecto en la edición 2027** (estado entre ediciones, copia de seguridad, scraper, de mock a datos reales).
+- [`docs/REUSE-2026.md`](docs/REUSE-2026.md) — checklist para reutilizar el proyecto en una edición (2026) y registro de mejoras.
 
 ## Comandos
 ```bash

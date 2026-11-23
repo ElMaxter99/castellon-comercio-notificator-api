@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.10.1 - 2026-11-22
+
+### Documentación
+- **`docs/EDICION-2027.md`**: guía completa para retomar el proyecto en la edición 2027 (estado entre ediciones, copia de seguridad de los datos 2026, señales de que ha empezado, comprobación del scraper, paso de mock a datos reales, lo aprendido en 2026, ideas aparcadas y checklist final).
+- README al día: estado entre ediciones, modo mock, modificaciones en el histórico, robustez (candado, cierre ordenado, cachés), estructura y tabla de documentación.
+- `REUSE-2026.md` y `CLAUDE.md` apuntan a la guía.
+
 ## v2.10.0 - 2026-11-22
 
 ### Añadido

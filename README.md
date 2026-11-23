@@ -27,6 +27,9 @@
 > [!NOTE]
 > **Proyecto independiente y sin ánimo de lucro.** Los datos se obtienen de la web oficial del programa ([bonoscastellodelaplana.es](https://bonoscastellodelaplana.es)) y se ofrecen solo con fines informativos. Sin relación con el Ayuntamiento de Castelló de la Plana ni con CONFECOMERÇ.
 
+> [!IMPORTANT]
+> **Estado (nov-2026): entre ediciones.** El programa 2026 termina y la API está desplegada en **modo mock** (`MOCK_MODE=true`): sirve datos de demostración **ficticios**, sin Redis, scrapeo ni correo; los datos reales de 2026 siguen intactos en Redis. Para volver a la actividad cuando empiece 2027: [**`docs/EDICION-2027.md`**](docs/EDICION-2027.md).
+
 ---
 
 ## 🧭 Ecosistema
@@ -54,10 +57,11 @@ flowchart LR
 ## ✨ Qué hace
 
 - 🔁 **Scrapea** el listado oficial (axios + cheerio) y recorre todas las páginas. Por defecto cada 5 minutos; la frecuencia se configura con `SCRAPE_CRON`.
-- 💾 **Guarda en Redis** el catálogo, los sectores, la fecha del último scrapeo y el **histórico** de altas y bajas.
+- 💾 **Guarda en Redis** el catálogo, los sectores, la fecha del último scrapeo y el **histórico** de altas, bajas y **modificaciones** (cambios de sector, teléfono, dirección o ubicación de un comercio), acotado a `HISTORY_MAX_ENTRIES`.
 - ✉️ **Avisa por correo** cuando aparecen comercios nuevos, con **SMTP tradicional o [Resend](https://resend.com)**.
 - 📦 **Expone una API REST** para el front: listado, estado, histórico, sectores y filtro.
-- 🛡️ **Robusto**: no vacía el catálogo si la web falla, limpia coordenadas erróneas, limita peticiones por IP, escapa el HTML del correo y reintenta las descargas.
+- 🛡️ **Robusto**: no vacía el catálogo si la web falla, no solapa scrapeos, se cierra ordenadamente ante `SIGTERM`, limpia coordenadas erróneas, limita peticiones por IP, escapa el HTML del correo, reintenta las descargas y cachea las respuestas (HTTP y en memoria).
+- 🧪 **Modo mock** (`MOCK_MODE=true`): datos de demostración ficticios para el periodo entre ediciones ([guía](docs/EDICION-2027.md)).
 - 🐳 **Despliegue sencillo**: Docker Compose o gratis con Render + Upstash ([guía](docs/HOSTING.md)).
 
 ## 🔄 Cómo funciona
@@ -75,7 +79,7 @@ sequenceDiagram
     R-->>C: lista guardada
     alt la lista nueva está vacía
         C-->>C: error en log, se conserva el catálogo
-    else hay altas o bajas
+    else hay altas, bajas o modificaciones
         C->>R: guarda catálogo, sectores e histórico
         opt hay altas y ya existía catálogo
             C->>M: sendDiffEmail(altas)
@@ -154,14 +158,14 @@ Base: `http://localhost:12001`. CORS abierto; límite por defecto de 120 peticio
 
 | Método | Ruta | Devuelve |
 |---|---|---|
-| `GET` | `/api/status` | Healthcheck (incluye `PING` a Redis) |
+| `GET` | `/api/status` | Healthcheck (incluye `PING` a Redis; en mock, `redis: "mock"`) |
 | `GET` | `/api/comercios` | Todos los comercios |
-| `GET` | `/api/comercios/status` | Entorno, total y fecha de la última actualización |
-| `GET` | `/api/comercios/history` | Histórico de altas y bajas (el más reciente primero; `?limit=N` para las N últimas) |
+| `GET` | `/api/comercios/status` | Entorno, `mode` (`live` o `mock`), total y fecha de la última actualización |
+| `GET` | `/api/comercios/history` | Histórico de altas y bajas (el más reciente primero; `?limit=N` para las N últimas); cada entrada puede traer `modified` |
 | `GET` | `/api/comercios/sectors` | Sectores disponibles |
 | `GET` | `/api/comercios/filter?name=&sector=` | Comercios filtrados por nombre o sector |
 | `GET` | `/api/health` | Salud para monitores: 503 si Redis falla o los datos llevan demasiado sin actualizarse (15 min por defecto; se adapta a `SCRAPE_CRON`) |
-| `POST` | `/api/comercios/force-scrape` 🔒 | Fuerza un scrapeo ahora (requiere `Authorization: Bearer $FORCE_SCRAPE_TOKEN`) |
+| `POST` | `/api/comercios/force-scrape` 🔒 | Fuerza un scrapeo ahora (requiere `Authorization: Bearer $FORCE_SCRAPE_TOKEN`; `409` si ya hay uno en curso o en modo mock) |
 
 Ejemplo de comercio (datos ficticios):
 
@@ -186,10 +190,12 @@ src/
 ├── cron.js                 runScrape() + programación (SCRAPE_CRON, por defecto */5 * * * *)
 ├── scraper/                descarga y parseo de la web oficial
 ├── routes/comercios.js     endpoints REST
-├── services/               Redis, correo (SMTP / Resend) y plantillas
-├── middleware/             rate limiter y logger HTTP
-├── utils/                  diff, logger, sanitizado
+├── services/               Redis, origen de datos (Redis o mock), correo (SMTP / Resend) y plantillas
+├── middleware/             rate limiter, logger HTTP y cabeceras (seguridad + caché)
+├── utils/                  diff (altas/bajas/modificaciones), cron, salud, histórico, caché, candado, cierre…
+├── mock/                   datos de demostración ficticios (MOCK_MODE)
 └── templates/              HTML del correo
+test/                       node --test: scraper (con HTML de ejemplo en test/fixtures/), diff, cron, salud…
 scripts/                    operación con Docker y reparación de sectores
 docs/                       documentación detallada
 ```
@@ -203,7 +209,8 @@ docs/                       documentación detallada
 | [`docs/SCRAPER.md`](docs/SCRAPER.md) | Cómo scrapea y cómo repararlo si la web cambia |
 | [`docs/OPERATIONS.md`](docs/OPERATIONS.md) | Variables de entorno, Docker, logs y mantenimiento |
 | [`docs/HOSTING.md`](docs/HOSTING.md) | Hosting gratuito: Render + Upstash + pinger |
-| [`docs/REUSE-2026.md`](docs/REUSE-2026.md) | Checklist para reutilizar el proyecto en una nueva edición |
+| [**`docs/EDICION-2027.md`**](docs/EDICION-2027.md) | **Guía para retomar el proyecto en 2027**: estado actual, copia de seguridad, scraper y paso de mock a datos reales |
+| [`docs/REUSE-2026.md`](docs/REUSE-2026.md) | Checklist general de reutilización y registro de mejoras de 2026 |
 | [`CHANGELOG.md`](CHANGELOG.md) | Historial de versiones |
 | [`CLAUDE.md`](CLAUDE.md) | Guía del proyecto para trabajar con Claude Code |
 
@@ -215,6 +222,7 @@ La documentación de la interfaz (ediciones, entornos, diseño) está en el [rep
 - Define un `FORCE_SCRAPE_TOKEN` largo (`openssl rand -hex 32`) si vas a usar `force-scrape`, y monitoriza `/api/health` con alertas.
 - Despliega tras HTTPS y revisa los logs; configura alertas de errores de Redis o de envío.
 - Usa un `REDIS_NAMESPACE` distinto en cada edición del programa.
+- Entre ediciones deja `MOCK_MODE=true`: no consulta la web oficial ni gasta Redis.
 
 ## 🔐 Privacidad y datos personales
 

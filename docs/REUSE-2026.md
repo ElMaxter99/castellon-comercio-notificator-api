@@ -1,5 +1,7 @@
 # Reutilizar el proyecto en 2026
 
+> **Para la edición 2027 empieza por [`EDICION-2027.md`](EDICION-2027.md)** (estado actual, copia de seguridad, scraper, paso de mock a datos reales). Este documento queda como checklist general y registro de mejoras de 2026.
+
 Guía para volver a poner en marcha el sistema con el programa de bonos 2026. Trabajar con Claude: pídele "sigue `docs/REUSE-2026.md` del repo api".
 
 ## 0. Antes de nada: ¿existe la web 2026?
